@@ -10,6 +10,7 @@
 //sistema de coleção de pilulas
 //	sitema de placar de pontos (baseados em pilulas)
 //	condicional de vitoria (baseado na quantidade de pilulas)
+//sistema de teletransporte nas bordas
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -23,17 +24,17 @@
 // Atualizado para 3.1.0: André Gustavo   03/06/26
 
 char mapa[11][21] = {     // Mapa do jogo
-  "11111111111111111111",
-  "10000100000000100001",
-  "10110101111110101101",
-  "10100000000000000101",
-  "10101101100110110101",
-  "10000001000010000001",
-  "10101101111110110101",
-  "10100000000000000101",
-  "10110101111110101101",
-  "10000100000000100001",
-  "11111111111111111111"
+  "12111111111111111121",
+  "12122222222222222221",
+  "12121121110111212121",
+  "12121121220221211121",
+  "22222220000000222222",
+  "11112121220221211121",
+  "11112121110111212121",
+  "12222222222222222221",
+  "12121112111112112121",
+  "12122222222222222121",
+  "12111111111111111121"
 };
 
 const float SIZE = 50;      // Tamanho de cada célula do mapa
@@ -41,6 +42,11 @@ const float SIZE = 50;      // Tamanho de cada célula do mapa
 int posx = 9; // posicao do PacMan
 int posy = 7;
 int inten[2]={0,0}; //intenção de movimento
+
+int gato1x = 8,  gato1y = 3; //posições dos fantasmas
+int gato2x = 12, gato2y = 3;
+int gato3x = 8,  gato3y = 5;
+int gato4x = 12, gato4y = 5;
 
 bool cima = false;  // direcao de movimento do PacMan
 bool baixo = false;
@@ -56,35 +62,47 @@ int main() {
     quad.setFillColor(sf::Color(0, 100, 200));
     quad.setOutlineThickness(-5);
     quad.setOutlineColor(sf::Color(50, 50, 50));
+	
+    //pilulas
+     sf::CircleShape circ(5);
+    circ.setFillColor(sf::Color(255, 255, 0));
 
     // sprites do PacMan
     sf::Texture texture;
-    if (!texture.loadFromFile("pacman.png")) {
-        std::cout << "Erro lendo imagem pacman.png\n";
+    if (!texture.loadFromFile("peixe_dir.png")) {
+        std::cout << "Erro lendo imagem peixe_dir.png\n";
         return 0;
     }
     sf::Sprite sprite{texture};
 
     sf::Texture texturesq;
-    if (!texturesq.loadFromFile("pacman-esq.png")) {
-        std::cout << "Erro lendo imagem pacman-esq.png\n";
+    if (!texturesq.loadFromFile("peixe_esq.png")) {
+        std::cout << "Erro lendo imagem peixe_esq.png\n";
         return 0;
     }
     sf::Sprite spritesq{texturesq};
 
-//    sf::Texture texturecim;
-//    if (!texturecim.loadFromFile("pacman.png")) {
-//       std::cout << "Erro lendo imagem pacman.png\n";
-//        return 0;
-//    }
-//    sf::Sprite sprite{texturecim};
+    sf::Texture texturecim;
+    if (!texturecim.loadFromFile("peixe_cima.png")) {
+       std::cout << "Erro lendo imagem peixe_cima.png\n";
+       return 0;
+    }
+    sf::Sprite spritecim{texturecim};
 
-//    sf::Texture texturebai;
-//    if (!texturesq.loadFromFile("pacman-esq.png")) {
-//        std::cout << "Erro lendo imagem pacman-esq.png\n";
-//        return 0;
-//    }
-//    sf::Sprite spritebai{texturebai};
+    sf::Texture texturebai;
+    if (!texturebai.loadFromFile("peixe_baixo.png")) {
+        std::cout << "Erro lendo imagem peixe_baixo.png\n";
+        return 0;
+    }
+    sf::Sprite spritebai{texturebai};
+
+        //sprites do fantasma
+    sf::Texture texturegato;
+    if (!texturegato.loadFromFile("gatinho.png")) {
+        std::cout << "Erro lendo imagem gatinho.png\n";
+        return 0;
+    }
+    sf::Sprite sprite2{texturegato};
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -158,35 +176,58 @@ int main() {
 
         // desenhar tudo aqui...
 
-        // desenha paredes
+        //desenha paredes
         for(int i=0;i<11;i++)
             for(int j=0;j<21;j++)
                 if (mapa[i][j]=='1') {
                     quad.setPosition({j*SIZE, i*SIZE});
                     window.draw(quad);
                 }
+	//desenha pilulas
+	for(int i=0;i<11;i++)
+            for(int j=0;j<21;j++)
+                if (mapa[i][j]=='2') {
+                    circ.setPosition({j*SIZE + 25, i*SIZE + 25});
+                    window.draw(circ);
+                }
+
 
         // desenha PacMan
-        if(dir)
-	{
-		sprite.setPosition({posx*SIZE,posy*SIZE});
-       		window.draw(sprite);
-	}
-	else if(esq)
+	if(inten[0]==-1)
 	{
 		spritesq.setPosition({posx*SIZE,posy*SIZE});
        		window.draw(spritesq);
 	}
-//	else if(cima)
-//	{
-//		spritecim.setPosition({posx*SIZE,posy*SIZE});
-//      	window.draw(spritecim);
-//	}
-//	else if(baixo)
-//	{
-//		spritebai.setPosition({posx*SIZE,posy*SIZE});
-//       	window.draw(spritebai);
-//	}
+	else if(inten[1]==-1)
+	{
+		spritecim.setPosition({posx*SIZE,posy*SIZE});
+      		window.draw(spritecim);
+	}
+	else if(inten[1]==1)
+	{
+		spritebai.setPosition({posx*SIZE,posy*SIZE});
+	       	window.draw(spritebai);
+	}
+	else
+	{
+		sprite.setPosition({posx*SIZE,posy*SIZE});
+       		window.draw(sprite);
+	}
+
+
+	//desenha fantasmas(gatinhos)
+        sprite2.setPosition({gato1x*SIZE,gato1y*SIZE});
+        window.draw(sprite2);
+
+        sprite2.setPosition({gato2x*SIZE, gato2y*SIZE});
+        window.draw(sprite2);
+
+        sprite2.setPosition({gato3x*SIZE, gato3y*SIZE});
+        window.draw(sprite2);
+
+        sprite2.setPosition({gato4x*SIZE, gato4y*SIZE});
+        window.draw(sprite2);
+
 
         // termina e desenha o frame corrente
         window.display();
