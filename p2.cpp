@@ -1,3 +1,6 @@
+//Thiago Luis de Arruda Rodrigues
+
+//to-do-list
 //movimento contínuo (baseado em tempo) do pacman
 //	sistema de troca de sprites baseado na direção de movimento
 //	o Pacman deve possuir um estado de movimento (em que dire¸c˜ao est´a se movimentando) e uma inten¸c˜ao de movimento (para qual dire¸c˜ao o jogador quer que ele se movimente);
