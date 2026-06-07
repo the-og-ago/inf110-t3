@@ -1,12 +1,12 @@
 //Thiago Luis de Arruda Rodrigues
 
 //to-do-list
-//movimento contínuo (baseado em tempo) do pacman
-//	sistema de troca de sprites baseado na direção de movimento
-//	o Pacman deve possuir um estado de movimento (em que dire¸c˜ao est´a se movimentando) e uma inten¸c˜ao de movimento (para qual dire¸c˜ao o jogador quer que ele se movimente);
-//		o pressionar uma tecla direcional, o jogador muda a inten¸c˜ao de movimento
-//		se as condi¸c˜oes atuais permitem alterar o estado de movimento para a inten¸c˜ao definida pelo jogador, ou seja, se n˜ao h´a parede adjacente na dire¸c˜ao escolhida, ele altera seu estado;
-//		en˜ao, ele continua se movimentando na dire¸c˜ao em que estava, ou seja, de acordo com seu estado; mas o sistema armazena a ´ultima inten¸c˜ao do jogador at´e que ela possa ser concretizada (ou que o jogador altere essa inten¸c˜ao, pressionando outra tecla).
+//*movimento contínuo (baseado em tempo) do pacman
+//	*sistema de troca de sprites baseado na direção de movimento
+//	*o Pacman deve possuir um estado de movimento (em que dire¸c˜ao est´a se movimentando) e uma inten¸c˜ao de movimento (para qual dire¸c˜ao o jogador quer que ele se movimente);
+//		*ao pressionar uma tecla direcional, o jogador muda a inten¸c˜ao de movimento
+//		*se as condi¸c˜oes atuais permitem alterar o estado de movimento para a inten¸c˜ao definida pelo jogador, ou seja, se n˜ao h´a parede adjacente na dire¸c˜ao escolhida, ele altera seu estado;
+//		*en˜ao, ele continua se movimentando na dire¸c˜ao em que estava, ou seja, de acordo com seu estado; mas o sistema armazena a ´ultima inten¸c˜ao do jogador at´e que ela possa ser concretizada (ou que o jogador altere essa inten¸c˜ao, pressionando outra tecla).
 //sistema de coleção de pilulas
 //	sitema de placar de pontos (baseados em pilulas)
 //	condicional de vitoria (baseado na quantidade de pilulas)
@@ -64,6 +64,27 @@ int main() {
         return 0;
     }
     sf::Sprite sprite{texture};
+
+    sf::Texture texturesq;
+    if (!texturesq.loadFromFile("pacman-esq.png")) {
+        std::cout << "Erro lendo imagem pacman-esq.png\n";
+        return 0;
+    }
+    sf::Sprite spritesq{texturesq};
+
+//    sf::Texture texturecim;
+//    if (!texturecim.loadFromFile("pacman.png")) {
+//       std::cout << "Erro lendo imagem pacman.png\n";
+//        return 0;
+//    }
+//    sf::Sprite sprite{texturecim};
+
+//    sf::Texture texturebai;
+//    if (!texturesq.loadFromFile("pacman-esq.png")) {
+//        std::cout << "Erro lendo imagem pacman-esq.png\n";
+//        return 0;
+//    }
+//    sf::Sprite spritebai{texturebai};
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -146,8 +167,26 @@ int main() {
                 }
 
         // desenha PacMan
-        sprite.setPosition({posx*SIZE,posy*SIZE});
-        window.draw(sprite);
+        if(dir)
+	{
+		sprite.setPosition({posx*SIZE,posy*SIZE});
+       		window.draw(sprite);
+	}
+	else if(esq)
+	{
+		spritesq.setPosition({posx*SIZE,posy*SIZE});
+       		window.draw(spritesq);
+	}
+//	else if(cima)
+//	{
+//		spritecim.setPosition({posx*SIZE,posy*SIZE});
+//      	window.draw(spritecim);
+//	}
+//	else if(baixo)
+//	{
+//		spritebai.setPosition({posx*SIZE,posy*SIZE});
+//       	window.draw(spritebai);
+//	}
 
         // termina e desenha o frame corrente
         window.display();
