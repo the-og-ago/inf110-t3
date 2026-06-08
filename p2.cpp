@@ -10,7 +10,7 @@
 //sistema de coleção de pilulas
 //	sitema de placar de pontos (baseados em pilulas)
 //	condicional de vitoria (baseado na quantidade de pilulas)
-//sistema de teletransporte nas bordas
+//*sistema de teletransporte nas bordas
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -22,8 +22,9 @@
 // Colisão com paredes:   não implementada
 // Intenção de movimento: não implementado
 // Atualizado para 3.1.0: André Gustavo   03/06/26
-
-char mapa[11][21] = {     // Mapa do jogo
+const int MAPLARG =21;
+const int MAPALT =11;
+char mapa[MAPALT][MAPLARG] = {     // Mapa do jogo
   "12111111111111111121",
   "12122222222222222221",
   "12121121110111212121",
@@ -140,23 +141,23 @@ int main() {
         // Muda a posição do PacMan a cada 0.2 segundos
         if (clock.getElapsedTime() > sf::seconds(0.2)) { // tempo desde último restart > 0.2s?
             clock.restart();      // recomeça contagem do tempo
-            if (cima&&mapa[posy-1][posx]!='1')
+	    if (cima&&mapa[posy-1][posx]!='1'|| posy==0) //evita a leitura de y=-1
 	    {
 		    posy--;
 		    inten[1]=-1; //salva a ultima instrução válida
-			inten[0]=0; //zera a instrução no outro eixo
-		}
+		    inten[0]=0; //zera a instrução no outro eixo	
+	    }
 	    else if (baixo&&mapa[posy+1][posx]!='1')
 	    {
 		    posy++;
 		    inten[1]=+1;
 		    inten[0]=0;
 	    }
-	    else if (esq&&mapa[posy][posx-1]!='1')
+	    else if (esq&&mapa[posy][posx-1]!='1'|| posx==0)
 	    {
 		    posx--;
 		    inten[0]=-1;
-		    inten[1]=0;
+		    inten[1]=0;	    	    
 	    }
 	    else if (dir&&mapa[posy][posx+1]!='1') 
 	    {
@@ -169,7 +170,15 @@ int main() {
 		    posy+=inten[1];
 		    posx+=inten[0];
 	    }
-        }
+	    if(posy>=MAPALT) //verifica caso do pac fora do mapa
+		posy=0; //inverte posição
+	    else if(posy<0) 
+		posy=MAPALT-1;
+	    else if(posx>=MAPLARG-1)//verifica se chegou ao /0 
+		posx=0;
+	    else if(posx<0) 
+		posx=MAPLARG-2; //transporta para fora de /0
+	}
 
         // limpa a janela com a cor preta
         window.clear(sf::Color::Black);
