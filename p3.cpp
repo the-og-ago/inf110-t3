@@ -2,6 +2,8 @@
 #include <iostream>
 #include <random>
 
+using namespace std;
+
 // Código base para jogo do Pac-Man usando SFML
 // Mapa desenhado:        André Gustavo   15/06/23
 // Movimentos Pac-Man:    André Gustavo   15/06/23
@@ -49,17 +51,33 @@ bool ehEncruzilhada(int i)
     return caminhosLivres > 2;
 }
 
+// Função para verificar se eh caminho sem saida
+bool semSaida(int i)
+{
+    int caminhosLivres = 0;
+    if (mapa[gatosy[i] - 1][gatosx[i]] != '1')
+        caminhosLivres++;
+    if (mapa[gatosy[i] + 1][gatosx[i]] != '1')
+        caminhosLivres++;
+    if (mapa[gatosy[i]][gatosx[i] - 1] != '1')
+        caminhosLivres++;
+    if (mapa[gatosy[i]][gatosx[i] + 1] != '1')
+        caminhosLivres++;
+
+    return caminhosLivres == 1; // se tiver apenas 1 caminho livre
+}
+
 void mudarDirecao(int i)
 {
     std::vector<int> opcoes;
     // Adiciona as opções válidas, excluindo o caminho de volta (a direção oposta)
-    if (mapa[gatosy[i] - 1][gatosx[i]] != '1' && !fbaixo[i])
+    if (mapa[gatosy[i] - 1][gatosx[i]] != '1' && (!fbaixo[i] || semSaida(i)))
         opcoes.push_back(0); // Cima
-    else if (mapa[gatosy[i] + 1][gatosx[i]] != '1' && !fcima[i])
+    else if (mapa[gatosy[i] + 1][gatosx[i]] != '1' && (!fcima[i] || semSaida(i)))
         opcoes.push_back(1); // Baixo
-    if (mapa[gatosy[i]][gatosx[i] - 1] != '1' && !fdir[i])
+    if (mapa[gatosy[i]][gatosx[i] - 1] != '1' && (!fdir[i] || semSaida(i)))
         opcoes.push_back(2); // Esq
-    if (mapa[gatosy[i]][gatosx[i] + 1] != '1' && !fesq[i])
+    if (mapa[gatosy[i]][gatosx[i] + 1] != '1' && (!fesq[i] || semSaida(i)))
         opcoes.push_back(3); // Dir
 
     if (!opcoes.empty())
@@ -124,7 +142,7 @@ int main()
             fclock.restart();
             for (int i = 0; i < 4; i++) // para cada fantasma
             {
-                if (ehEncruzilhada(i))
+                if (ehEncruzilhada(i) || semSaida(i))
                 {
                     mudarDirecao(i);
                 }
@@ -133,49 +151,45 @@ int main()
                 {
                     if (mapa[gatosy[i] - 1][gatosx[i]] != '1')
                         gatosy[i]--;
-                    if (gatosy[i] < 0)
-                        gatosy[i] = 10;
                     else
                     {
-                        fcima[i] = false;
                         mudarDirecao(i);
                     }
+                    if (gatosy[i] < 0)
+                        gatosy[i] = 10;
                 }
                 else if (fbaixo[i])
                 {
                     if (mapa[gatosy[i] + 1][gatosx[i]] != '1')
                         gatosy[i]++;
-                    if (gatosy[i] > 10)
-                        gatosy[i] = 0;
                     else
                     {
-                        fbaixo[i] = false;
                         mudarDirecao(i);
                     }
+                    if (gatosy[i] > 10)
+                        gatosy[i] = 0;
                 }
                 else if (fesq[i])
                 {
                     if (mapa[gatosy[i]][gatosx[i] - 1] != '1')
                         gatosx[i]--;
-                    if (gatosx[i] < 0)
-                        gatosx[i] = 20;
                     else
                     {
-                        fesq[i] = false;
                         mudarDirecao(i);
                     }
+                    if (gatosx[i] < 0)
+                        gatosx[i] = 19;
                 }
                 else if (fdir[i])
                 {
                     if (mapa[gatosy[i]][gatosx[i] + 1] != '1')
                         gatosx[i]++;
-                    if (gatosx[i] > 20)
-                        gatosx[i] = 0;
                     else
                     {
-                        fdir[i] = false;
                         mudarDirecao(i);
                     }
+                    if (gatosx[i] > 19)
+                        gatosx[i] = 0;
                 }
             }
         }
