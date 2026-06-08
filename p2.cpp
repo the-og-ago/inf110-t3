@@ -141,7 +141,7 @@ int main() {
         // Muda a posição do PacMan a cada 0.2 segundos
         if (clock.getElapsedTime() > sf::seconds(0.2)) { // tempo desde último restart > 0.2s?
             clock.restart();      // recomeça contagem do tempo
-	    if (cima&&mapa[posy-1][posx]!='1'|| posy==0) //evita a leitura de y=-1
+	    if (cima&&mapa[posy-1][posx]!='1')
 	    {
 		    posy--;
 		    inten[1]=-1; //salva a ultima instrução válida
@@ -153,7 +153,7 @@ int main() {
 		    inten[1]=+1;
 		    inten[0]=0;
 	    }
-	    else if (esq&&mapa[posy][posx-1]!='1'|| posx==0)
+	    else if (esq&&mapa[posy][posx-1]!='1')
 	    {
 		    posx--;
 		    inten[0]=-1;
