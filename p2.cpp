@@ -23,33 +23,35 @@
 // Colisão com paredes:   não implementada
 // Intenção de movimento: não implementado
 // Atualizado para 3.1.0: André Gustavo   03/06/26
-const int MAPLARG =21;
-const int MAPALT =11;
-char mapa[MAPALT][MAPLARG] = {     // Mapa do jogo
-  "12111111111111111121",
-  "12122222222222222221",
-  "12121121110111212121",
-  "12121121220221211121",
-  "22222220000000222222",
-  "11112121220221211121",
-  "11112121110111212121",
-  "12222222222222222221",
-  "12121112111112112121",
-  "12122222222222222121",
-  "12111111111111111121"
+const int MAPLARG =23;
+const int MAPALT =13;
+char mapa[MAPALT][MAPLARG] = {  // Mapa do jogo
+  "333333333333333333333",
+  "3121111111111111111213",
+  "3121222222222222222213",
+  "3121211211101112121213",
+  "3121211212202212111213",
+  "3222222200000002222223",
+  "3111121212202212111213",
+  "3111121211101112121213",
+  "3122222222222222222213",
+  "3121211121111121121213",
+  "3121222222222222221213",
+  "3121111111111111111213",
+  "3333333333333333333333"
 };
 
 const float SIZE = 50;      // Tamanho de cada célula do mapa
 
 int posx = 9; // posicao do PacMan
-int posy = 7;
+int posy = 8;
 int inten[2]={0,0}; //intenção de movimento
 int pontos =0;
 
-int gato1x = 8,  gato1y = 3; //posições dos fantasmas
-int gato2x = 12, gato2y = 3;
-int gato3x = 8,  gato3y = 5;
-int gato4x = 12, gato4y = 5;
+int gato1x = 9,  gato1y = 4; //posições dos fantasmas
+int gato2x = 13, gato2y = 4;
+int gato3x = 9,  gato3y = 6;
+int gato4x = 13, gato4y = 6;
 
 bool cima = false;  // direcao de movimento do PacMan
 bool baixo = false;
@@ -57,13 +59,17 @@ bool esq = false;
 bool dir = true;
 int main() {
     // cria a janela
-    sf::RenderWindow window(sf::VideoMode({1000, 550}), "Pac-Man");
+    sf::RenderWindow window(sf::VideoMode({1100, 650}), "Pac-Man");
 
     // cria um quadrado de tamanho 50 (a parede)
     sf::RectangleShape quad({SIZE, SIZE});
     quad.setFillColor(sf::Color(0, 100, 200));
     quad.setOutlineThickness(-5);
     quad.setOutlineColor(sf::Color(50, 50, 50));
+    
+    //quadrado para as margens do jogo
+    sf::RectangleShape quadmargem({SIZE, SIZE});
+    quadmargem.setFillColor(sf::Color(0, 20, 60));
 	
     //pilulas
      sf::CircleShape circ(5);
@@ -105,6 +111,14 @@ int main() {
         return 0;
     }
     sf::Sprite sprite2{texturegato};
+    
+    sf::Texture textureaquario;
+    if (!textureaquario.loadFromFile("aquario.png")) {
+        std::cout << "Erro lendo imagem aquario.png\n";
+        return 0;
+    }
+    sf::Sprite sprite3{textureaquario};
+
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -192,15 +206,24 @@ int main() {
         // desenhar tudo aqui...
 
         //desenha paredes
-        for(int i=0;i<11;i++)
-            for(int j=0;j<21;j++)
+        for(int i=0;i<13;i++)
+            for(int j=0;j<23;j++)
                 if (mapa[i][j]=='1') {
                     quad.setPosition({j*SIZE, i*SIZE});
                     window.draw(quad);
                 }
+                
+       //desenha as margens            
+        for(int i=0;i<13;i++)
+           for(int j=0;j<23;j++)
+                if (mapa[i][j]=='3') {
+                    quadmargem.setPosition({j*SIZE, i*SIZE});
+                    window.draw(quadmargem);
+                }
+                
 	//desenha pilulas
-	for(int i=0;i<11;i++)
-            for(int j=0;j<21;j++)
+	for(int i=0;i<13;i++)
+            for(int j=0;j<23;j++)
                 if (mapa[i][j]=='2') {
                     circ.setPosition({j*SIZE + 25, i*SIZE + 25});
                     window.draw(circ);
@@ -243,7 +266,10 @@ int main() {
         sprite2.setPosition({gato4x*SIZE, gato4y*SIZE});
         window.draw(sprite2);
 
-
+     //desenha a margem topo 
+      sprite3.setPosition({0,0});
+        window.draw(sprite3);
+        
         // termina e desenha o frame corrente
         window.display();
     }
