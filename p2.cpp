@@ -15,6 +15,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+
 // Código base para jogo do Pac-Man usando SFML
 // Mapa desenhado:        André Gustavo   15/06/23
 // Movimentos Pac-Man:    André Gustavo   15/06/23
@@ -43,6 +44,7 @@ const float SIZE = 50;      // Tamanho de cada célula do mapa
 int posx = 9; // posicao do PacMan
 int posy = 7;
 int inten[2]={0,0}; //intenção de movimento
+int pontos =0;
 
 int gato1x = 8,  gato1y = 3; //posições dos fantasmas
 int gato2x = 12, gato2y = 3;
@@ -53,7 +55,6 @@ bool cima = false;  // direcao de movimento do PacMan
 bool baixo = false;
 bool esq = false;
 bool dir = true;
-
 int main() {
     // cria a janela
     sf::RenderWindow window(sf::VideoMode({1000, 550}), "Pac-Man");
@@ -178,6 +179,11 @@ int main() {
 		posx=0;
 	    else if(posx<0) 
 		posx=MAPLARG-2; //transporta para fora de /0
+	}
+	if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
+	{
+		pontos++;
+		mapa[posy][posx]='0';
 	}
 
         // limpa a janela com a cor preta
