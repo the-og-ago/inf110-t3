@@ -185,14 +185,14 @@ int main() {
 		    posy+=inten[1];
 		    posx+=inten[0];
 	    }
-	    if(posy>=MAPALT) //verifica caso do pac fora do mapa
-		posy=0; //inverte posição
-	    else if(posy<0) 
-		posy=MAPALT-1;
-	    else if(posx>=MAPLARG-1)//verifica se chegou ao /0 
-		posx=0;
-	    else if(posx<0) 
-		posx=MAPLARG-2; //transporta para fora de /0
+	    if(posy>=MAPALT-1) //verifica caso do pac fora do mapa
+		posy=1; //inverte posição
+	    else if(posy<1) 
+		posy=MAPALT-2;
+	    else if(posx>=MAPLARG-2)//verifica se chegou ao /0 
+		posx=1;
+	    else if(posx<1) 
+		posx=MAPLARG-3; //transporta para fora de /0
 	}
 	if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
 	{
