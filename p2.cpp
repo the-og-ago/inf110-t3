@@ -14,7 +14,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
-
+#include <string>
+#include <cstring>
+using namespace std;
 
 // Código base para jogo do Pac-Man usando SFML
 // Mapa desenhado:        André Gustavo   15/06/23
@@ -47,6 +49,7 @@ int posx = 9; // posicao do PacMan
 int posy = 8;
 int inten[2]={0,0}; //intenção de movimento
 int pontos =0;
+int pontosmax=0;
 
 int gato1x = 9,  gato1y = 4; //posições dos fantasmas
 int gato2x = 13, gato2y = 4;
@@ -58,6 +61,12 @@ bool baixo = false;
 bool esq = false;
 bool dir = true;
 int main() {
+    for(int i=0;i<MAPALT;i++) //verifica a quantidade de pilulas
+	    for(int j=0;j<MAPLARG;j++)
+	    {
+		if(mapa[i][j]=='2')
+			pontosmax++;
+	    }
     // cria a janela
     sf::RenderWindow window(sf::VideoMode({1100, 650}), "Pac-Man");
 
@@ -119,6 +128,21 @@ int main() {
     }
     sf::Sprite sprite3{textureaquario};
 
+    sf::Font fonte; //carrega fonte
+    if (!fonte.openFromFile("Emulogic-zrEw.ttf")) {
+        std::cout << "Erro lendo a fonte Emulogic-zrEw.ttf\n";
+        return 0; 
+    }
+    sf::Text placar(fonte); //cria um placar 
+    placar.setCharacterSize(40); 
+    placar.setFillColor(sf::Color::White); 
+    placar.setPosition({0.f, 0.f}); 
+
+    sf::Text win(fonte); //texto de vitoria
+    win.setString("Vitoria!!!");
+    win.setCharacterSize(100); 
+    win.setFillColor(sf::Color::White); 
+    win.setPosition({10.f, 225.f}); 
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -185,14 +209,14 @@ int main() {
 		    posy+=inten[1];
 		    posx+=inten[0];
 	    }
-	    if(posy>=MAPALT) //verifica caso do pac fora do mapa
-		posy=0; //inverte posição
-	    else if(posy<0) 
-		posy=MAPALT-1;
-	    else if(posx>=MAPLARG-1)//verifica se chegou ao /0 
-		posx=0;
-	    else if(posx<0) 
-		posx=MAPLARG-2; //transporta para fora de /0
+	    if(posy>=MAPALT-1) //verifica caso do pac fora do mapa
+		posy=1; //inverte posição
+	    else if(posy<1) 
+		posy=MAPALT-2;
+	    else if(posx>=MAPLARG-2)//verifica se chegou ao /0 
+		posx=1;
+	    else if(posx<1) 
+		posx=MAPLARG-3; //transporta para fora de /0
 	}
 	if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
 	{
@@ -269,9 +293,18 @@ int main() {
      //desenha a margem topo 
       sprite3.setPosition({0,0});
         window.draw(sprite3);
+	
+	placar.setString("Pontos: " + to_string(pontos));
+	window.draw(placar); //desenha o placar
         
         // termina e desenha o frame corrente
         window.display();
+	while(pontos==pontosmax) //condição de vitória
+	{
+		window.clear(sf::Color::Black);
+		window.draw(win); 
+		window.display();
+	}
     }
 
     return 0;
