@@ -529,24 +529,19 @@ int main() {
         quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
         window.draw(quad);
 
-        // termina e desenha o frame corrente
-        window.display();
 	//desenha a margem topo 
         sprite3.setPosition({0,0});
         window.draw(sprite3);
 	
 	placar.setString("Pontos: " + to_string(pontos));
 	window.draw(placar); //desenha o placar
-        
-        // termina e desenha o frame corrente
-        window.display();
-	while(pontos==pontosmax) //condição de vitória
+        if(pontos==pontosmax) //condição de vitória
 	{
 		window.clear(sf::Color::Black);
-		window.draw(win); 
-		window.display();
+		window.draw(win);
 	}
-
+        // termina e desenha o frame corrente
+        window.display();	
     }
     return 0;
 }
