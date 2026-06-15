@@ -54,6 +54,15 @@ bool fbaixo[] = {false, true, false, false, false};
 bool fesq[] = {false, false, true, false, false};
 bool fdir[] = {false, false, false, true, false};
 
+struct Mov //movimentos do player 2
+{	
+	bool input=false;
+	bool di=false, es=false, up=false, dow=false;
+	int movimentox=0, movimentoy=0;
+	int posx=8,posy=3;
+};
+Mov p2;
+
 int targetx = gatosx[1];
 int targety = gatosy[1];
 
@@ -287,6 +296,26 @@ int main() {
                       baixo = true;   // down key: PacMan tem intenção de se mover para baixo
                       esq = dir = cima = false;
                   }
+		  if (keyPressed->scancode == sf::Keyboard::Scancode::W) { //detecção do segundo player
+                      p2.input=true;
+		      p2.up=true;
+		      p2.dow=p2.di=p2.es=false;
+                  }
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::S) {
+		      p2.input=true;
+		      p2.dow=true;
+		      p2.up=p2.di=p2.es=false;
+                  }
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::A) {
+		      p2.input=true;
+		      p2.es=true;
+		      p2.up=p2.dow=p2.di=false;
+                  }
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::D) {
+		      p2.input=true;
+		      p2.di=true;
+		      p2.up=p2.dow=p2.es=false;
+                  }
             }
         }
 
@@ -331,6 +360,48 @@ int main() {
 	    else if(posx<1) 
 		posx=MAPLARG-3; //transporta para fora de /0
 	}
+	// Muda a posição do Player 2 a cada 0.4 segundos se um input for detectado
+        if (clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) { 
+            clock.restart(); 
+	    if (p2.up&&mapa[posy-1][posx]!='1')
+	    {
+		    gatosy[0]--;
+		    p2.movimentoy=-1; 
+		    p2.movimentox=0; 
+	    }
+	    else if (p2.dow&&mapa[posy+1][posx]!='1')
+	    {
+		    gatosy[0]++;
+		    p2.movimentoy=1; 
+		    p2.movimentox=0;
+	    }
+	    else if (p2.es&&mapa[posy][posx-1]!='1')
+	    {
+		    gatosx[0]--;
+		    p2.movimentoy=0; 
+		    p2.movimentox=-1;    	    
+	    }
+	    else if (p2.di&&mapa[posy][posx+1]!='1') 
+	    {
+		    gatosx[0]++;
+		    p2.movimentoy=0; 
+		    p2.movimentox=1;
+	    }
+	    else if(mapa[posy+inten[1]][posx+inten[0]]!='1')
+	    {
+		    gatosy[0]+=p2.movimentoy;
+		    gatosx[0]+=p2.movimentox;
+	    }
+	    if(gatosy[0]>=MAPALT-1)
+		gatosy[0]=1; 
+	    else if(gatosy[0]<1) 
+		gatosy[0]=MAPALT-2;
+	    else if(posx>=MAPLARG-2) 
+		gatosx[0]=1;
+	    else if(gatosx[0]<1) 
+		gatosx[0]=MAPLARG-3;
+	}
+
 	// Muda a posição dos fantasmas a cada 0.2 segundos
         if (fclock.getElapsedTime() > sf::seconds(0.2))
         {
