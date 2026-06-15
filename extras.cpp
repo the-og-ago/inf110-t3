@@ -59,7 +59,7 @@ struct Mov //movimentos do player 2
 	bool input=false;
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
-	int posx=8,posy=3;
+	int posx=9,posy=4;
 };
 Mov p2;
 
@@ -235,6 +235,14 @@ int main() {
     }
     sf::Sprite spritebai{texturebai};
 
+    //textura do p2
+    sf::Texture texturep2;
+    if (!texturep2.loadFromFile("gatinho.png")) {
+        std::cout << "Erro lendo imagem blackcat.png\n";
+        return 0;
+    }
+    sf::Sprite spritep2{texturep2};
+
         //sprites do fantasma
     sf::Texture texturegato;
     if (!texturegato.loadFromFile("gatinho.png")) {
@@ -268,6 +276,8 @@ int main() {
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
+    // cria um relogio para medir o tempo do player 2
+    sf::Clock p2clock;
     // cria um relogio para medir o tempo dos fantasmas
     sf::Clock fclock;
     // executa o programa enquanto a janela está aberta
@@ -361,45 +371,45 @@ int main() {
 		posx=MAPLARG-3; //transporta para fora de /0
 	}
 	// Muda a posição do Player 2 a cada 0.4 segundos se um input for detectado
-        if (clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) { 
-            clock.restart(); 
-	    if (p2.up&&mapa[posy-1][posx]!='1')
+        if (p2clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) { 
+            p2clock.restart(); 
+	    if (p2.up&&mapa[p2.posy-1][p2.posx]!='1')
 	    {
-		    gatosy[0]--;
+		    p2.posy--;
 		    p2.movimentoy=-1; 
 		    p2.movimentox=0; 
 	    }
-	    else if (p2.dow&&mapa[posy+1][posx]!='1')
+	    else if (p2.dow&&mapa[p2.posy+1][p2.posx]!='1')
 	    {
-		    gatosy[0]++;
+		    p2.posy++;
 		    p2.movimentoy=1; 
 		    p2.movimentox=0;
 	    }
-	    else if (p2.es&&mapa[posy][posx-1]!='1')
+	    else if (p2.es&&mapa[p2.posy][p2.posx-1]!='1')
 	    {
-		    gatosx[0]--;
+		    p2.posx--;
 		    p2.movimentoy=0; 
 		    p2.movimentox=-1;    	    
 	    }
-	    else if (p2.di&&mapa[posy][posx+1]!='1') 
+	    else if (p2.di&&mapa[p2.posy][p2.posx+1]!='1') 
 	    {
-		    gatosx[0]++;
+		    p2.posx++;
 		    p2.movimentoy=0; 
 		    p2.movimentox=1;
 	    }
-	    else if(mapa[posy+inten[1]][posx+inten[0]]!='1')
+	    else if(mapa[p2.posy+p2.movimentoy][p2.posx+p2.movimentox]!='1')
 	    {
-		    gatosy[0]+=p2.movimentoy;
-		    gatosx[0]+=p2.movimentox;
+		    p2.posy+=p2.movimentoy;
+		    p2.posx+=p2.movimentox;
 	    }
-	    if(gatosy[0]>=MAPALT-1)
-		gatosy[0]=1; 
-	    else if(gatosy[0]<1) 
-		gatosy[0]=MAPALT-2;
-	    else if(posx>=MAPLARG-2) 
-		gatosx[0]=1;
-	    else if(gatosx[0]<1) 
-		gatosx[0]=MAPLARG-3;
+	    if(p2.posy>=MAPALT-1)
+		p2.posy=1; 
+	    else if(p2.posy<1) 
+		p2.posy=MAPALT-2;
+	    else if(p2.posx>=MAPLARG-2) 
+		p2.posx=1;
+	    else if(p2.posx<1) 
+		p2.posx=MAPLARG-3;
 	}
 
 	// Muda a posição dos fantasmas a cada 0.2 segundos
@@ -595,10 +605,17 @@ int main() {
             sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
             window.draw(sprite2);
         }
-
+	
         // estou deixando o fantasma que persegue sendo um quadrado de parede, para ser mais visivel nos testes
         quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
         window.draw(quad);
+
+	//desenha p2
+	if(p2.input)
+	{
+		spritep2.setPosition({p2.posx*SIZE,p2.posy*SIZE});
+       		window.draw(spritep2);
+	}
 
 	//desenha a margem topo 
         sprite3.setPosition({0,0});
