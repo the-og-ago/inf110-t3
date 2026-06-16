@@ -111,59 +111,6 @@ void mudarDirecao(int i)
     }
 }
 
-void mudarDirecaoInteligente(int i)
-{
-    double dist = 9999;
-    int escolha = 0;
-    if (mapa[gatosy[i] - 1][gatosx[i]] != '1' && (!fbaixo[i] || semSaida(i))) // cima
-    {
-        double d = sqrt(pow(gatosx[4] - targetx, 2) - pow(gatosy[4] - 1 - targety, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    else if (mapa[gatosy[i] + 1][gatosx[i]] != '1' && (!fcima[i] || semSaida(i))) // baixo
-    {
-        double d = sqrt(pow(gatosx[4] - targetx, 2) - pow(gatosy[4] + 1 - targety, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    if (mapa[gatosy[i]][gatosx[i] - 1] != '1' && (!fdir[i] || semSaida(i))) // esq
-    {
-        float d = sqrt(pow(gatosx[4] - 1 - targetx, 2) - pow(gatosy[4] - targety, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    if (mapa[gatosy[i]][gatosx[i] + 1] != '1' && (!fesq[i] || semSaida(i))) // dir
-    {
-        float d = sqrt(pow(gatosx[4] + 1 - targetx, 2) - pow(gatosy[4] - targety, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-
-    // Reseta todas e ativa a escolhida (nesse caso eh a q tiver a menor distancia direta com o alvo)
-    fcima[i] = fbaixo[i] = fesq[i] = fdir[i] = false;
-    if (escolha == 0)
-        fcima[i] = true;
-    else if (escolha == 1)
-        fbaixo[i] = true;
-    else if (escolha == 2)
-        fesq[i] = true;
-    else if (escolha == 3)
-        fdir[i] = true;
-}
-
 int main()
 {
     // cria a janela
