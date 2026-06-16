@@ -44,6 +44,8 @@ bool baixo = false;
 bool esq = false;
 bool dir = true;
 
+bool vivo = true; //se o pacman  não foi morto pelos fantasmas
+
 // posições dos fantasmas / o ultimo eh o "inteligente"
 int gatosx[] = {8, 12, 8, 12, 10};
 int gatosy[] = {3, 3, 5, 5, 4};
@@ -54,9 +56,10 @@ bool fbaixo[] = {false, true, false, false, false};
 bool fesq[] = {false, false, true, false, false};
 bool fdir[] = {false, false, false, true, false};
 
-struct Mov //movimentos do player 2
+struct Mov //infos do player2
 {	
 	bool input=false;
+	bool vivo=true;
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
@@ -238,7 +241,7 @@ int main() {
     //textura do p2
     sf::Texture texturep2;
     if (!texturep2.loadFromFile("gatinho.png")) {
-        std::cout << "Erro lendo imagem blackcat.png\n";
+        std::cout << "Erro lendo imagem gatinho.png\n";
         return 0;
     }
     sf::Sprite spritep2{texturep2};
@@ -258,21 +261,33 @@ int main() {
     }
     sf::Sprite sprite3{textureaquario};
 
-    sf::Font fonte; //carrega fonte
+    sf::Font fonte; //carrega fonte principal
     if (!fonte.openFromFile("Emulogic-zrEw.ttf")) {
         std::cout << "Erro lendo a fonte Emulogic-zrEw.ttf\n";
         return 0; 
     }
+    sf::Font fonte2; //carrega fonte secundária
+    if (!fonte2.openFromFile("PacfontGood-yYye.ttf")) {
+        std::cout << "Erro lendo a fonte PacfontGood-yYye.ttf\n";
+        return 0; 
+    }
+    
     sf::Text placar(fonte); //cria um placar 
     placar.setCharacterSize(40); 
     placar.setFillColor(sf::Color::White); 
     placar.setPosition({0.f, 0.f}); 
 
-    sf::Text win(fonte); //texto de vitoria
-    win.setString("Vitoria!!!");
+    sf::Text win(fonte2); //texto de vitoria
+    win.setString("Vitoria!!! 1  9");
     win.setCharacterSize(100); 
     win.setFillColor(sf::Color::White); 
-    win.setPosition({10.f, 225.f}); 
+    win.setPosition({100.f, 225.f}); 
+
+    sf::Text lose(fonte2); //texto de derrota
+    lose.setString("Derrota 9000001");
+    lose.setCharacterSize(100); 
+    lose.setFillColor(sf::Color::Red); 
+    lose.setPosition({100.f, 225.f}); 
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -623,10 +638,16 @@ int main() {
 	
 	placar.setString("Pontos: " + to_string(pontos));
 	window.draw(placar); //desenha o placar
-        if(pontos==pontosmax) //condição de vitória
+        if(pontos==pontosmax&&vivo) //condição de vitória, check de "vivo" para evitar que o pacman ganhe post mortem
 	{
 		window.clear(sf::Color::Black);
 		window.draw(win);
+	}
+	else if((p2.posx==posx&&p2.posy==posy&&p2.input)||!vivo) //condição de derrota do pacman/ vitoria do p2|fantasmas
+	{	
+		vivo=false; //"mata" o pacman  
+		window.clear(sf::Color::Black);
+		window.draw(lose);
 	}
         // termina e desenha o frame corrente
         window.display();	
