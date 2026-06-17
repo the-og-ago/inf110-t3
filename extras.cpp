@@ -601,17 +601,23 @@ int main() {
 		mapa[posy][posx]='0';
 	}
 
-	//mata o fantasma (verificado a cada frame, não apenas quando os fantasmas se movem)
-	if(pilulaAtiva)
-    {
+	//mata o fantasma 
+	
         for(int i=0; i<4; i++)
         {
             if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
             {
-                gatovivo[i]=false;
+                if(pilulaAtiva)
+                {
+                    gatovivo[i]=false;
+                }
+                else 
+                    vivo=false; //"mata" o pacman 
             }
         }
-    }
+    
+    
+
 
         // limpa a janela com a cor preta
         window.clear(sf::Color::Black);
