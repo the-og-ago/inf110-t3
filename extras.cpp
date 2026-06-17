@@ -62,7 +62,6 @@ bool pilulaAtiva = false; //verifica se a pilula esta ativa
 sf::Clock tempoPilula; //relogio da pilula
 
 float tempoFantasma = 0.2; // tempo normal do fantasma
-
 struct Mov //infos do player2
 {	
 	bool input=false;
@@ -70,6 +69,7 @@ struct Mov //infos do player2
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
+    float tempop2 = 0.2; // tempo normal do player 2
 };
 Mov p2;
 
@@ -398,8 +398,9 @@ int main() {
 	    else if(posx<1) 
 		posx=MAPLARG-3; //transporta para fora de /0
 	}
-	// Muda a posição do Player 2 a cada 0.4 segundos se um input for detectado
-        if (p2clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) 
+	// Muda a posição do Player 2 de acordo com se a pilula esta ou n ativa
+
+        if (p2clock.getElapsedTime() > sf::seconds(p2.tempop2)&&p2.input) 
         { 
             p2clock.restart(); 
 	    if (p2.up&&mapa[p2.posy-1][p2.posx]!='1')
@@ -444,6 +445,7 @@ int main() {
     if (pilulaAtiva)
 {
     tempoFantasma = 0.8; // fantasma fica mais lento quando a pilula ta ativa
+    p2.tempop2 = 0.8; // fantasma controlavel tbm fica mais lento 
 }
 
 //ativa a pilula de força
@@ -453,11 +455,12 @@ int main() {
         pilulaAtiva = true;
         tempoPilula.restart(); // começa a contar do zero o tempo da pilula
 	}         
-    
+    //se o tempo da pilula acabou, volta ao normal
     if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(7))
     {
         pilulaAtiva = false;
         tempoFantasma = 0.2;
+        p2.tempop2 = 0.2;
     }
 
 	// Muda a posição dos fantasmas de acordo com se a pilula esta ativa ou não
@@ -657,7 +660,7 @@ int main() {
                 }    
     
 
-        // desenha PacMan
+    // desenha PacMan
 	if(inten[0]==-1)
 	{
 		spritesq.setPosition({posx*SIZE,posy*SIZE});
@@ -713,9 +716,16 @@ int main() {
 	}
 	else if((p2.posx==posx&&p2.posy==posy&&p2.input)||!vivo) //condição de derrota do pacman/ vitoria do p2|fantasmas
 	{	
-		vivo=false; //"mata" o pacman  
-		window.clear(sf::Color::Black);
-		window.draw(lose);
+        if(!pilulaAtiva)
+        {
+            vivo=false; //"mata" o pacman  
+            window.clear(sf::Color::Black);
+            window.draw(lose);
+        }
+        else 
+        {
+            p2.input= false;
+        }
 	}
         // termina e desenha o frame corrente
         window.display();	
