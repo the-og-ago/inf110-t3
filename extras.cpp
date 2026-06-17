@@ -45,7 +45,8 @@ bool esq = false;
 bool dir = true;
 
 bool vivo = true; //se o pacman  não foi morto pelos fantasmas
-
+bool gatovivo[4] = {true, true, true, true}; // se os fantasmas n foram mortos pelo pacman
+bool p2vivo = true;
 // posições dos fantasmas / o ultimo eh o "inteligente"
 int gatosx[] = {8, 12, 8, 12, 10};
 int gatosy[] = {3, 3, 5, 5, 4};
@@ -453,7 +454,7 @@ int main() {
         tempoPilula.restart(); // começa a contar do zero o tempo da pilula
 	}         
     
-    if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(10))
+    if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(7))
     {
         pilulaAtiva = false;
         tempoFantasma = 0.2;
@@ -515,6 +516,11 @@ int main() {
                         gatosx[i] = 1;
             }
         }    
+
+       // if()//gato controlavel morre
+        //{
+
+        //}
 
             // movimentacao do fantasma "inteligente"
             // para cada direcao livre, ele escolhe a que esta mais perto do alvo, em uma linha reta
@@ -595,6 +601,18 @@ int main() {
 		mapa[posy][posx]='0';
 	}
 
+	//mata o fantasma (verificado a cada frame, não apenas quando os fantasmas se movem)
+	if(pilulaAtiva)
+    {
+        for(int i=0; i<4; i++)
+        {
+            if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
+            {
+                gatovivo[i]=false;
+            }
+        }
+    }
+
         // limpa a janela com a cor preta
         window.clear(sf::Color::Black);
 
@@ -655,16 +673,20 @@ int main() {
        		window.draw(sprite);
 	}
 	 // desenha fantasmas(gatinhos)
-        for (int i = 0; i < 4; i++)
-        {
+    
+     
+    for(int i=0; i<4; i++)
+    { 
+     if(gatovivo[i])
+    {   
             sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
-            window.draw(sprite2);
-        }
-	
+            window.draw(sprite2);      
+    }   
+    }
         // estou deixando o fantasma que persegue sendo um quadrado de parede, para ser mais visivel nos testes
-        quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
-        window.draw(quad);
-
+       quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
+       window.draw(quad);
+    
 	//desenha p2
 	if(p2.input)
 	{
