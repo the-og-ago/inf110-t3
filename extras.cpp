@@ -18,17 +18,17 @@ using namespace std;
 const int MAPLARG = 23;
 const int MAPALT = 13;
 char mapa[MAPALT][MAPLARG] = { // Mapa do jogo
-    "333333333333333333333",
+    "3333333333333333333333",
     "3121111111111111111213",
-    "3121222222222222222213",
-    "3121211211101112121213",
+    "3141222222222222222213",
+    "3121211211101112141213",
     "3121211212202212111213",
     "3222222200000002222223",
     "3111121212202212111213",
-    "3111121211101112121213",
+    "3111121211101112141213",
     "3122222222222222222213",
     "3121211121111121121213",
-    "3121222222222222221213",
+    "3141222222222222221213",
     "3121111111111111111213",
     "3333333333333333333333"};
 const float SIZE = 50;      // Tamanho de cada célula do mapa
@@ -55,6 +55,12 @@ bool fcima[] = {true, false, false, false, false};
 bool fbaixo[] = {false, true, false, false, false};
 bool fesq[] = {false, false, true, false, false};
 bool fdir[] = {false, false, false, true, false};
+
+//pilula de força
+bool pilulaAtiva = false; //verifica se a pilula esta ativa
+sf::Clock tempoPilula; //relogio da pilula
+
+float tempoFantasma = 0.2; // tempo normal do fantasma
 
 struct Mov //infos do player2
 {	
@@ -208,6 +214,12 @@ int main() {
     //pilulas
      sf::CircleShape circ(5);
     circ.setFillColor(sf::Color(255, 255, 0));
+    
+    //pilula de força
+    
+     sf::CircleShape pilulaforca(10);
+    pilulaforca.setFillColor(sf::Color(255, 165, 0));
+
 
     // sprites do PacMan
     sf::Texture texture;
@@ -386,7 +398,8 @@ int main() {
 		posx=MAPLARG-3; //transporta para fora de /0
 	}
 	// Muda a posição do Player 2 a cada 0.4 segundos se um input for detectado
-        if (p2clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) { 
+        if (p2clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) 
+        { 
             p2clock.restart(); 
 	    if (p2.up&&mapa[p2.posy-1][p2.posx]!='1')
 	    {
@@ -427,8 +440,27 @@ int main() {
 		p2.posx=MAPLARG-3;
 	}
 
-	// Muda a posição dos fantasmas a cada 0.2 segundos
-        if (fclock.getElapsedTime() > sf::seconds(0.2))
+    if (pilulaAtiva)
+{
+    tempoFantasma = 0.8; // fantasma fica mais lento quando a pilula ta ativa
+}
+
+//ativa a pilula de força
+    if(mapa[posy][posx]=='4') 
+	{
+		mapa[posy][posx]='0';
+        pilulaAtiva = true;
+        tempoPilula.restart(); // começa a contar do zero o tempo da pilula
+	}         
+    
+    if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(10))
+    {
+        pilulaAtiva = false;
+        tempoFantasma = 0.2;
+    }
+
+	// Muda a posição dos fantasmas de acordo com se a pilula esta ativa ou não
+        if (fclock.getElapsedTime() > sf::seconds(tempoFantasma))
         {
             fclock.restart();
             for (int i = 0; i < 4; i++) // para cada fantasma
@@ -481,8 +513,8 @@ int main() {
                     }
                     if (gatosx[i] > MAPLARG - 3)
                         gatosx[i] = 1;
-                }
             }
+        }    
 
             // movimentacao do fantasma "inteligente"
             // para cada direcao livre, ele escolhe a que esta mais perto do alvo, em uma linha reta
@@ -592,6 +624,14 @@ int main() {
                     window.draw(circ);
                 }
 
+    //desenha a pilula de força
+	for(int i=0;i<13;i++)
+            for(int j=0;j<23;j++)
+                if (mapa[i][j]=='4') {
+                    pilulaforca.setPosition({j*SIZE + 20, i*SIZE + 20});
+                    window.draw(pilulaforca);
+                }    
+    
 
         // desenha PacMan
 	if(inten[0]==-1)
