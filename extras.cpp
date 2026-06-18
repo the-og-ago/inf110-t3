@@ -253,8 +253,8 @@ int main() {
 
     //textura do p2
     sf::Texture texturep2;
-    if (!texturep2.loadFromFile("gatinho.png")) {
-        std::cout << "Erro lendo imagem gatinho.png\n";
+    if (!texturep2.loadFromFile("gatinho_rosa.png")) {
+        std::cout << "Erro lendo imagem gatinho_rosa.png\n";
         return 0;
     }
     sf::Sprite spritep2{texturep2};
@@ -273,6 +273,13 @@ int main() {
         return 0;
     }
     sf::Sprite sprite3{textureaquario};
+
+    sf::Texture texturegatoazul;
+    if (!texturegatoazul.loadFromFile("gatinho_azul.png")) {
+        std::cout << "Erro lendo imagem aquario.png\n";
+        return 0;
+    }
+    sf::Sprite spritegatoazul{texturegatoazul};
 
     sf::Font fonte; //carrega fonte principal
     if (!fonte.openFromFile("Emulogic-zrEw.ttf")) {
@@ -679,17 +686,24 @@ int main() {
 	else
 	{
 		sprite.setPosition({posx*SIZE,posy*SIZE});
-       		window.draw(sprite);
+       	window.draw(sprite);
 	}
-	 // desenha fantasmas(gatinhos)
-    
-     
+	
+    // desenha fantasmas(gatinhos)
     for(int i=0; i<4; i++)
     { 
      if(gatovivo[i])
     {   
+        if(!pilulaAtiva)
+        {
             sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
-            window.draw(sprite2);      
+            window.draw(sprite2);
+        }
+        else
+        {
+            spritegatoazul.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
+            window.draw(spritegatoazul);  
+        }          
     }   
     }
         // estou deixando o fantasma que persegue sendo um quadrado de parede, para ser mais visivel nos testes
