@@ -18,17 +18,17 @@ using namespace std;
 const int MAPLARG = 23;
 const int MAPALT = 13;
 char mapa[MAPALT][MAPLARG] = { // Mapa do jogo
-    "333333333333333333333",
+    "3333333333333333333333",
     "3121111111111111111213",
-    "3121222222222222222213",
-    "3121211211101112121213",
+    "3141222222222222222213",
+    "3121211211101112141213",
     "3121211212202212111213",
     "3222222200000002222223",
     "3111121212202212111213",
-    "3111121211101112121213",
+    "3111121211101112141213",
     "3122222222222222222213",
     "3121211121111121121213",
-    "3121222222222222221213",
+    "3141222222222222221213",
     "3121111111111111111213",
     "3333333333333333333333"};
 const float SIZE = 50;      // Tamanho de cada célula do mapa
@@ -45,7 +45,8 @@ bool esq = false;
 bool dir = true;
 
 bool vivo = true; //se o pacman  não foi morto pelos fantasmas
-
+bool gatovivo[4] = {true, true, true, true}; // se os fantasmas n foram mortos pelo pacman
+bool p2vivo = true;
 // posições dos fantasmas / o ultimo eh o "inteligente"
 int gatosx[] = {8, 12, 8, 12, 10};
 int gatosy[] = {3, 3, 5, 5, 4};
@@ -56,6 +57,11 @@ bool fbaixo[] = {false, true, false, false, false};
 bool fesq[] = {false, false, true, false, false};
 bool fdir[] = {false, false, false, true, false};
 
+//pilula de força
+bool pilulaAtiva = false; //verifica se a pilula esta ativa
+sf::Clock tempoPilula; //relogio da pilula
+
+float tempoFantasma = 0.2; // tempo normal do fantasma
 struct Mov //infos do player2
 {	
 	bool input=false;
@@ -63,6 +69,7 @@ struct Mov //infos do player2
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
+    float tempop2 = 0.2; // tempo normal do player 2
 };
 Mov p2;
 
@@ -208,6 +215,12 @@ int main() {
     //pilulas
      sf::CircleShape circ(5);
     circ.setFillColor(sf::Color(255, 255, 0));
+    
+    //pilula de força
+    
+     sf::CircleShape pilulaforca(10);
+    pilulaforca.setFillColor(sf::Color(255, 165, 0));
+
 
     // sprites do PacMan
     sf::Texture texture;
@@ -240,8 +253,8 @@ int main() {
 
     //textura do p2
     sf::Texture texturep2;
-    if (!texturep2.loadFromFile("gatinho.png")) {
-        std::cout << "Erro lendo imagem gatinho.png\n";
+    if (!texturep2.loadFromFile("gatinho_rosa.png")) {
+        std::cout << "Erro lendo imagem gatinho_rosa.png\n";
         return 0;
     }
     sf::Sprite spritep2{texturep2};
@@ -260,6 +273,13 @@ int main() {
         return 0;
     }
     sf::Sprite sprite3{textureaquario};
+
+    sf::Texture texturegatoazul;
+    if (!texturegatoazul.loadFromFile("gatinho_azul.png")) {
+        std::cout << "Erro lendo imagem aquario.png\n";
+        return 0;
+    }
+    sf::Sprite spritegatoazul{texturegatoazul};
 
     sf::Font fonte; //carrega fonte principal
     if (!fonte.openFromFile("Emulogic-zrEw.ttf")) {
@@ -385,8 +405,10 @@ int main() {
 	    else if(posx<1) 
 		posx=MAPLARG-3; //transporta para fora de /0
 	}
-	// Muda a posição do Player 2 a cada 0.4 segundos se um input for detectado
-        if (p2clock.getElapsedTime() > sf::seconds(0.4)&&p2.input) { 
+	// Muda a posição do Player 2 de acordo com se a pilula esta ou n ativa
+
+        if (p2clock.getElapsedTime() > sf::seconds(p2.tempop2)&&p2.input) 
+        { 
             p2clock.restart(); 
 	    if (p2.up&&mapa[p2.posy-1][p2.posx]!='1')
 	    {
@@ -427,8 +449,29 @@ int main() {
 		p2.posx=MAPLARG-3;
 	}
 
-	// Muda a posição dos fantasmas a cada 0.2 segundos
-        if (fclock.getElapsedTime() > sf::seconds(0.2))
+    if (pilulaAtiva)
+{
+    tempoFantasma = 0.8; // fantasma fica mais lento quando a pilula ta ativa
+    p2.tempop2 = 0.8; // fantasma controlavel tbm fica mais lento 
+}
+
+//ativa a pilula de força
+    if(mapa[posy][posx]=='4') 
+	{
+		mapa[posy][posx]='0';
+        pilulaAtiva = true;
+        tempoPilula.restart(); // começa a contar do zero o tempo da pilula
+	}         
+    //se o tempo da pilula acabou, volta ao normal
+    if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(7))
+    {
+        pilulaAtiva = false;
+        tempoFantasma = 0.2;
+        p2.tempop2 = 0.2;
+    }
+
+	// Muda a posição dos fantasmas de acordo com se a pilula esta ativa ou não
+        if (fclock.getElapsedTime() > sf::seconds(tempoFantasma))
         {
             fclock.restart();
             for (int i = 0; i < 4; i++) // para cada fantasma
@@ -481,8 +524,13 @@ int main() {
                     }
                     if (gatosx[i] > MAPLARG - 3)
                         gatosx[i] = 1;
-                }
             }
+        }    
+
+       // if()//gato controlavel morre
+        //{
+
+        //}
 
             // movimentacao do fantasma "inteligente"
             // para cada direcao livre, ele escolhe a que esta mais perto do alvo, em uma linha reta
@@ -563,6 +611,24 @@ int main() {
 		mapa[posy][posx]='0';
 	}
 
+	//mata o fantasma 
+	
+        for(int i=0; i<4; i++)
+        {
+            if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
+            {
+                if(pilulaAtiva)
+                {
+                    gatovivo[i]=false;
+                }
+                else 
+                    vivo=false; //"mata" o pacman 
+            }
+        }
+    
+    
+
+
         // limpa a janela com a cor preta
         window.clear(sf::Color::Black);
 
@@ -592,8 +658,16 @@ int main() {
                     window.draw(circ);
                 }
 
+    //desenha a pilula de força
+	for(int i=0;i<13;i++)
+            for(int j=0;j<23;j++)
+                if (mapa[i][j]=='4') {
+                    pilulaforca.setPosition({j*SIZE + 20, i*SIZE + 20});
+                    window.draw(pilulaforca);
+                }    
+    
 
-        // desenha PacMan
+    // desenha PacMan
 	if(inten[0]==-1)
 	{
 		spritesq.setPosition({posx*SIZE,posy*SIZE});
@@ -612,19 +686,30 @@ int main() {
 	else
 	{
 		sprite.setPosition({posx*SIZE,posy*SIZE});
-       		window.draw(sprite);
+       	window.draw(sprite);
 	}
-	 // desenha fantasmas(gatinhos)
-        for (int i = 0; i < 4; i++)
+	
+    // desenha fantasmas(gatinhos)
+    for(int i=0; i<4; i++)
+    { 
+     if(gatovivo[i])
+    {   
+        if(!pilulaAtiva)
         {
             sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
             window.draw(sprite2);
         }
-	
+        else
+        {
+            spritegatoazul.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
+            window.draw(spritegatoazul);  
+        }          
+    }   
+    }
         // estou deixando o fantasma que persegue sendo um quadrado de parede, para ser mais visivel nos testes
-        quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
-        window.draw(quad);
-
+       quad.setPosition({gatosx[4] * SIZE, gatosy[4] * SIZE});
+       window.draw(quad);
+    
 	//desenha p2
 	if(p2.input)
 	{
@@ -645,9 +730,16 @@ int main() {
 	}
 	else if((p2.posx==posx&&p2.posy==posy&&p2.input)||!vivo) //condição de derrota do pacman/ vitoria do p2|fantasmas
 	{	
-		vivo=false; //"mata" o pacman  
-		window.clear(sf::Color::Black);
-		window.draw(lose);
+        if(!pilulaAtiva)
+        {
+            vivo=false; //"mata" o pacman  
+            window.clear(sf::Color::Black);
+            window.draw(lose);
+        }
+        else 
+        {
+            p2.input= false;
+        }
 	}
         // termina e desenha o frame corrente
         window.display();	
