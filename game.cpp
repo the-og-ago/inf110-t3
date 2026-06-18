@@ -13,8 +13,6 @@ using namespace std;
 // Intenção de movimento: não implementado
 // Atualizado para 3.1.0: André Gustavo   03/06/26
 
-// O sistema de perseguicao esta um pouco "defeituoso", as vezes o fantasma fica preso em um loop, indo pra frente e pra tras, acho q isso tem a ver com o mapa ter esquinas e caminhos sem saida, e a forma q o fantasma calcula a melhor direcao
-
 const int MAPLARG = 23;
 const int MAPALT = 13;
 char mapa[MAPALT][MAPLARG] = { // Mapa do jogo
@@ -45,17 +43,18 @@ bool esq = false;
 bool dir = true;
 
 // posições dos fantasmas / o ultimo eh o "inteligente"
-int gatosx[] = {8, 12, 8, 12, 10};
-int gatosy[] = {3, 3, 5, 5, 4};
+int gatosx[] = {8, 12, 8, 12};
+int gatosy[] = {3, 3, 5, 5};
 
 // direcoes dos fantasmas
-bool fcima[] = {true, false, false, false, false};
-bool fbaixo[] = {false, true, false, false, false};
-bool fesq[] = {false, false, true, false, false};
-bool fdir[] = {false, false, false, true, false};
+bool fcima[] = {true, false, false, false};
+bool fbaixo[] = {false, true, false, false};
+bool fesq[] = {false, false, true, false};
+bool fdir[] = {false, false, false, true};
+
 // Função para verificar se há mais de 2 caminhos (o que ele veio + novas opções)
 bool ehEncruzilhada(int i)
-{
+{ // verifica todos os 4 lados, se n for parede, add 1 unidade aos caminhos livres
     int caminhosLivres = 0;
     if (mapa[gatosy[i] - 1][gatosx[i]] != '1')
         caminhosLivres++;
@@ -66,7 +65,7 @@ bool ehEncruzilhada(int i)
     if (mapa[gatosy[i]][gatosx[i] + 1] != '1')
         caminhosLivres++;
 
-    return caminhosLivres > 2;
+    return caminhosLivres > 2; // retorna true se tiver mais de 2 caminhos
 }
 
 // Função para verificar se eh caminho sem saida
@@ -82,9 +81,10 @@ bool semSaida(int i)
     if (mapa[gatosy[i]][gatosx[i] + 1] != '1')
         caminhosLivres++;
 
-    return caminhosLivres == 1; // se tiver apenas 1 caminho livre
+    return caminhosLivres == 1; // se tiver apenas 1 caminho livre, significa q o unico caminho possivel eh voltar
 }
 
+// func que escolhe uma direcao, das disponiveis, para andar
 void mudarDirecao(int i)
 {
     int num = 0;
@@ -121,10 +121,11 @@ void mudarDirecao(int i)
         static std::mt19937 gen(std::random_device{}());
         std::uniform_int_distribution<> distrib(0, num);
 
-        int escolha = opcoes[distrib(gen)];
+        int escolha = opcoes[distrib(gen)]; // direcao escolhida
 
         // Reseta todas e ativa a escolhida
         fcima[i] = fbaixo[i] = fesq[i] = fdir[i] = false;
+        // muda a direcao, dependendo da escolha
         if (escolha == 0)
             fcima[i] = true;
         else if (escolha == 1)
@@ -136,58 +137,8 @@ void mudarDirecao(int i)
     }
 }
 
-void mudarDirecaoInteligente(int i)
-{
-    double dist = 9999;
-    int escolha = 0;
-    if (mapa[gatosy[i] - 1][gatosx[i]] != '1' && (!fbaixo[i] || semSaida(i))) // cima
-    {
-        double d = sqrt(pow(gatosx[4] - posx, 2) - pow(gatosy[4] - 1 - posy, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    else if (mapa[gatosy[i] + 1][gatosx[i]] != '1' && (!fcima[i] || semSaida(i))) // baixo
-    {
-        double d = sqrt(pow(gatosx[4] - posx, 2) - pow(gatosy[4] + 1 - posy, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    if (mapa[gatosy[i]][gatosx[i] - 1] != '1' && (!fdir[i] || semSaida(i))) // esq
-    {
-        float d = sqrt(pow(gatosx[4] - 1 - posx, 2) - pow(gatosy[4] - posy, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
-    if (mapa[gatosy[i]][gatosx[i] + 1] != '1' && (!fesq[i] || semSaida(i))) // dir
-    {
-        float d = sqrt(pow(gatosx[4] + 1 - posx, 2) - pow(gatosy[4] - posy, 2));
-        if (d < dist)
-        {
-            dist = d;
-            escolha = 0;
-        }
-    }
+// func mudarDirecaoInteligente, pois nao estava sendo usada
 
-    // Reseta todas e ativa a escolhida (nesse caso eh a q tiver a menor distancia direta com o alvo)
-    fcima[i] = fbaixo[i] = fesq[i] = fdir[i] = false;
-    if (escolha == 0)
-        fcima[i] = true;
-    else if (escolha == 1)
-        fbaixo[i] = true;
-    else if (escolha == 2)
-        fesq[i] = true;
-    else if (escolha == 3)
-        fdir[i] = true;
-}
 int main()
 {
     for (int i = 0; i < MAPALT; i++) // verifica a quantidade de pilulas
@@ -366,24 +317,24 @@ int main()
         if (fclock.getElapsedTime() > sf::seconds(0.2))
         {
             fclock.restart();
-            for (int i = 0; i < 4; i++) // para cada fantasma
+            for (int i = 0; i < 3; i++) // para cada fantasma
             {
-                if (ehEncruzilhada(i) || semSaida(i))
+                if (ehEncruzilhada(i) || semSaida(i)) // verifica se esta em encrusilhada ou sem saida
                 {
-                    mudarDirecao(i);
+                    mudarDirecao(i); // se tiver, muda de direcao
                 }
 
-                if (fcima[i])
+                if (fcima[i]) // se for para cima
                 {
-                    if (mapa[gatosy[i] - 1][gatosx[i]] != '1')
-                        gatosy[i]--;
+                    if (mapa[gatosy[i] - 1][gatosx[i]] != '1') // e pra cima nao for parede
+                        gatosy[i]--;                           // sobe
                     else
                     {
-                        mudarDirecao(i);
+                        mudarDirecao(i); // caso contrario (seja parede), muda de direcao
                     }
-                    if (gatosy[i] < 1)
-                        gatosy[i] = MAPALT - 2;
-                }
+                    if (gatosy[i] < 1)          // se o fantasma tiver atravessado a borda do mapa
+                        gatosy[i] = MAPALT - 2; // teleporta para o lado oposto
+                } // essa logica se segue para os prox 3 if
                 else if (fbaixo[i])
                 {
                     if (mapa[gatosy[i] + 1][gatosx[i]] != '1')
@@ -424,36 +375,36 @@ int main()
             double menordistancia = 999;
             double distancia;
             int direcaoescolhida = -1;
-            if (mapa[gatosy[4] - 1][gatosx[4]] != '1')
+            if (mapa[gatosy[3] - 1][gatosx[3]] != '1') // se a direcao de cima nao for parede
             {
-                distancia = sqrt(pow(gatosx[4] - posx, 2) + pow(gatosy[4] - 1 - posy, 2));
-                if (distancia < menordistancia)
+                distancia = sqrt(pow(gatosx[3] - posx, 2) + pow(gatosy[3] - 1 - posy, 2)); // calcula distancia
+                if (distancia < menordistancia)                                            // se a distancia atual for menor do q a menor dist ate agr
                 {
-                    menordistancia = distancia;
-                    direcaoescolhida = 0;
+                    menordistancia = distancia; // distancia atual vira a menordistancia
+                    direcaoescolhida = 0;       // direcao escolhida vira 0 (cima)
                 }
-            }
-            if (mapa[gatosy[4] + 1][gatosx[4]] != '1')
+            } // essa logica se repete nos 3 if
+            if (mapa[gatosy[3] + 1][gatosx[3]] != '1')
             {
-                distancia = sqrt(pow(gatosx[4] - posx, 2) + pow(gatosy[4] + 1 - posy, 2));
+                distancia = sqrt(pow(gatosx[3] - posx, 2) + pow(gatosy[3] + 1 - posy, 2));
                 if (distancia < menordistancia)
                 {
                     menordistancia = distancia;
                     direcaoescolhida = 1;
                 }
             }
-            if (mapa[gatosy[4]][gatosx[4] - 1] != '1')
+            if (mapa[gatosy[3]][gatosx[3] - 1] != '1')
             {
-                distancia = sqrt(pow(gatosx[4] - 1 - posx, 2) + pow(gatosy[4] - posy, 2));
+                distancia = sqrt(pow(gatosx[3] - 1 - posx, 2) + pow(gatosy[3] - posy, 2));
                 if (distancia < menordistancia)
                 {
                     menordistancia = distancia;
                     direcaoescolhida = 2;
                 }
             }
-            if (mapa[gatosy[4]][gatosx[4] + 1] != '1')
+            if (mapa[gatosy[3]][gatosx[3] + 1] != '1')
             {
-                distancia = sqrt(pow(gatosx[4] + 1 - posx, 2) + pow(gatosy[4] - posy, 2));
+                distancia = sqrt(pow(gatosx[3] + 1 - posx, 2) + pow(gatosy[3] - posy, 2));
                 if (distancia < menordistancia)
                 {
                     menordistancia = distancia;
@@ -462,34 +413,35 @@ int main()
             }
 
             // anda na direcao escolhida
+            // mesma logica dos outros fantasmas
             if (direcaoescolhida == 0)
             {
-                if (gatosy[4] < 1)
-                    gatosy[4] = MAPALT - 2;
+                if (gatosy[3] < 1)
+                    gatosy[3] = MAPALT - 2;
                 else
-                    gatosy[4]--;
+                    gatosy[3]--;
             }
             else if (direcaoescolhida == 1)
             {
-                if (gatosy[4] > MAPALT - 2)
-                    gatosy[4] = 1;
+                if (gatosy[3] > MAPALT - 2)
+                    gatosy[3] = 1;
                 else
-                    gatosy[4]++;
+                    gatosy[3]++;
             }
             else if (direcaoescolhida == 2)
             {
 
-                if (gatosx[4] < 1)
-                    gatosx[4] = MAPLARG - 3;
+                if (gatosx[3] < 1)
+                    gatosx[3] = MAPLARG - 3;
                 else
-                    gatosx[4]--;
+                    gatosx[3]--;
             }
             else if (direcaoescolhida == 3)
             {
-                if (gatosx[4] > MAPLARG - 3)
-                    gatosx[4] = 1;
+                if (gatosx[3] > MAPLARG - 3)
+                    gatosx[3] = 1;
                 else
-                    gatosx[4]++;
+                    gatosx[3]++;
             }
         }
         if (mapa[posy][posx] == '2') // sistema de pontos, conta e remove as pilulas
@@ -552,7 +504,7 @@ int main()
             window.draw(sprite);
         }
         // desenha fantasmas(gatinhos)
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
         {
             sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
             window.draw(sprite2);
