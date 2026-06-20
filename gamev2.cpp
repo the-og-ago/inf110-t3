@@ -69,6 +69,7 @@ struct Mov //infos do player2
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
     float tempop2 = 0.2; // tempo normal do player 2
+    sf::Clock posmorteclock; // quanto tempo passou depois que p2 morreu
 };
 Mov p2;
 
@@ -310,22 +311,25 @@ int main() {
                       baixo = true;   // down key: PacMan tem intenção de se mover para baixo
                       esq = dir = cima = false;
                   }
-		  if (keyPressed->scancode == sf::Keyboard::Scancode::W) { //detecção do segundo player
+
+         
+
+		  if (keyPressed->scancode == sf::Keyboard::Scancode::W && p2.vivo==true) { //detecção do segundo player, ele não pode reviver
                       p2.input=true;
 		      p2.up=true;
 		      p2.dow=p2.di=p2.es=false;
                   }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::S) {
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::S && p2.vivo==true ) {
 		      p2.input=true;
 		      p2.dow=true;
 		      p2.up=p2.di=p2.es=false;
                   }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::A) {
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::A && p2.vivo==true) {
 		      p2.input=true;
 		      p2.es=true;
 		      p2.up=p2.dow=p2.di=false;
                   }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::D) {
+		  else if (keyPressed->scancode == sf::Keyboard::Scancode::D && p2.vivo==true) {
 		      p2.input=true;
 		      p2.di=true;
 		      p2.up=p2.dow=p2.es=false;
@@ -692,9 +696,15 @@ int main() {
                  }
        		 else 
        		 {
-            		 p2.input= false;
+                    p2.vivo=false; //mata o player 2 
+            		p2.input= false;
+                    p2.posmorteclock.restart();
         	 }
 	}
+
+    if(p2.posmorteclock.getElapsedTime() > sf::seconds(5))
+        p2.vivo = true; // depois que passou 5 segundos que o player 2 morreu, ele pode reviver
+        
         // termina e desenha o frame corrente
         window.display();	
     }
