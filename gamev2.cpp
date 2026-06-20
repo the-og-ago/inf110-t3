@@ -68,7 +68,7 @@ struct Mov //infos do player2
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
-    float tempop2 = 0.2; // tempo normal do player 2
+        float tempop2 = 0.2; // tempo normal do player 2
 };
 Mov p2;
 
@@ -497,10 +497,12 @@ int main() {
 
             // movimentacao do fantasma "inteligente"
             // para cada direcao livre, ele escolhe a que esta mais perto do alvo, em uma linha reta
+            // ADD MAIS UMA VERIFICACAO, PARA IMPEDIR MEIA VOLTA
             double menordistancia = 999;
             double distancia;
             int direcaoescolhida = -1;
-            if (mapa[gatosy[3] - 1][gatosx[3]] != '1') // se a direcao de cima nao for parede
+
+            if (mapa[gatosy[3] - 1][gatosx[3]] != '1' && (!fbaixo[3] || semSaida(3))) // se a direcao de cima nao for parede
             {
                 distancia = sqrt(pow(gatosx[3] - posx, 2) + pow(gatosy[3] - 1 - posy, 2)); // calcula distancia
                 if (distancia < menordistancia)                                            // se a distancia atual for menor do q a menor dist ate agr
@@ -509,7 +511,7 @@ int main() {
                     direcaoescolhida = 0;       // direcao escolhida vira 0 (cima)
                 }
             } // essa logica se repete nos 3 if
-            if (mapa[gatosy[3] + 1][gatosx[3]] != '1')
+            if (mapa[gatosy[3] + 1][gatosx[3]] != '1' && (!fcima[3] || semSaida(3)))
             {
                 distancia = sqrt(pow(gatosx[3] - posx, 2) + pow(gatosy[3] + 1 - posy, 2));
                 if (distancia < menordistancia)
@@ -518,7 +520,7 @@ int main() {
                     direcaoescolhida = 1;
                 }
             }
-            if (mapa[gatosy[3]][gatosx[3] - 1] != '1')
+            if (mapa[gatosy[3]][gatosx[3] - 1] != '1' && (!fdir[3] || semSaida(3)))
             {
                 distancia = sqrt(pow(gatosx[3] - 1 - posx, 2) + pow(gatosy[3] - posy, 2));
                 if (distancia < menordistancia)
@@ -527,7 +529,7 @@ int main() {
                     direcaoescolhida = 2;
                 }
             }
-            if (mapa[gatosy[3]][gatosx[3] + 1] != '1')
+            if (mapa[gatosy[3]][gatosx[3] + 1] != '1' && (!fesq[3] || semSaida(3)))
             {
                 distancia = sqrt(pow(gatosx[3] + 1 - posx, 2) + pow(gatosy[3] - posy, 2));
                 if (distancia < menordistancia)
@@ -539,37 +541,46 @@ int main() {
 
             // anda na direcao escolhida
             // mesma logica dos outros fantasmas
+            // EDITEI OS NUMEROS , QND ENTRAVA NOS  PORTAIS DE CIMA E DE BAIXO NAO TELEPORTAVA
+            // ADD TMB TRECHO Q ATUALIZA A DIRECAO, USADO PARA IMPEDIR MEIA VOLTA
             if (direcaoescolhida == 0)
             {
-                if (gatosy[3] < 1)
+                fcima[3] = fbaixo[3] = fesq[3] = fdir[3] = false;
+                fcima[3] = true;
+                if (gatosy[3] < 2)
                     gatosy[3] = MAPALT - 2;
                 else
                     gatosy[3]--;
             }
             else if (direcaoescolhida == 1)
             {
-                if (gatosy[3] > MAPALT - 2)
-                    gatosy[3] = 1;
+                fcima[3] = fbaixo[3] = fesq[3] = fdir[3] = false;
+                fbaixo[3] = true;
+                if (gatosy[3] > MAPALT - 3)
+                    gatosy[3] = 2;
                 else
                     gatosy[3]++;
             }
             else if (direcaoescolhida == 2)
             {
-
-                if (gatosx[3] < 1)
+                fcima[3] = fbaixo[3] = fesq[3] = fdir[3] = false;
+                fesq[3] = true;
+                if (gatosx[3] < 2)
                     gatosx[3] = MAPLARG - 3;
                 else
                     gatosx[3]--;
             }
             else if (direcaoescolhida == 3)
             {
+                fcima[3] = fbaixo[3] = fesq[3] = fdir[3] = false;
+                fdir[3] = true;
                 if (gatosx[3] > MAPLARG - 3)
                     gatosx[3] = 1;
                 else
                     gatosx[3]++;
             }
         }
-	if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
+        if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
 	{
 		pontos++;
 		mapa[posy][posx]='0';
