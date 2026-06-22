@@ -68,8 +68,8 @@ struct Mov //infos do player2
 	bool di=false, es=false, up=false, dow=false;
 	int movimentox=0, movimentoy=0;
 	int posx=9,posy=4;
-    float tempop2 = 0.2; // tempo normal do player 2
-    sf::Clock posmorteclock; // quanto tempo passou depois que p2 morreu
+        float tempop2 = 0.2; // tempo normal do player 2
+        sf::Clock posmorteclock; // quanto tempo passou depois que p2 morreu
 };
 Mov p2;
 
@@ -158,8 +158,21 @@ void mudarDirecao(int i)
     }
 }
 
-// func mudarDirecaoInteligente, pois nao estava sendo usada
-
+//mata o fantasma 
+void death(){
+        for(int i=0; i<4; i++)
+        {
+            if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
+            {
+                if(pilulaAtiva)
+                {
+                    gatovivo[i]=false;
+                }
+                else 
+                    vivo=false; //"mata" o pacman 
+            }
+        }
+}
 int main() {
     for(int i=0;i<MAPALT;i++) //verifica a quantidade de pilulas
 	    for(int j=0;j<MAPLARG;j++)
@@ -377,6 +390,7 @@ int main() {
 		posx=1;
 	    else if(posx<1) 
 		posx=MAPLARG-3; //transporta para fora de /0
+	    death();
 	}
 
 	// Muda a posição do Player 2 de acordo com se a pilula esta ou n ativa
@@ -420,6 +434,7 @@ int main() {
 		p2.posx=1;
 	    else if(p2.posx<1) 
 		p2.posx=MAPLARG-3;
+	    death();
 	}
 	if (pilulaAtiva)
 	{
@@ -583,6 +598,7 @@ int main() {
                 else
                     gatosx[3]++;
             }
+	    death();
         }
         if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
 	{
@@ -590,21 +606,7 @@ int main() {
 		mapa[posy][posx]='0';
 	}
 
-	//mata o fantasma 
-	
-        for(int i=0; i<4; i++)
-        {
-            if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
-            {
-                if(pilulaAtiva)
-                {
-                    gatovivo[i]=false;
-                }
-                else 
-                    vivo=false; //"mata" o pacman 
-            }
-        }
-        // limpa a janela com a cor preta
+	// limpa a janela com a cor preta
         window.clear(sf::Color::Black);
 
         // desenhar tudo aqui...
