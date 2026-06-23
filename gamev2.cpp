@@ -29,26 +29,26 @@ char mapa[MAPALT][MAPLARG] = { // Mapa do jogo
     "3141222222222222221213",
     "3121111111111111111213",
     "3333333333333333333333"};
-const float SIZE = 50;      // Tamanho de cada célula do mapa
+const float SIZE = 50; // Tamanho de cada célula do mapa
 
 int posx = 9; // posicao do PacMan
 int posy = 8;
-int inten[2]={0,0}; //intenção de movimento
-int pontos =0;
-int pontosmax=0;
+int inten[2] = {0, 0}; // intenção de movimento
+int pontos = 0;
+int pontosmax = 0;
 
-bool cima = false;  // direcao de movimento do PacMan
+bool cima = false; // direcao de movimento do PacMan
 bool baixo = false;
 bool esq = false;
 bool dir = true;
 
-bool vivo = true; //se o pacman  não foi morto pelos fantasmas
+bool vivo = true;                            // se o pacman  não foi morto pelos fantasmas
 bool gatovivo[4] = {true, true, true, true}; // se os fantasmas n foram mortos pelo pacman
 bool p2vivo = true;
 
 // posições dos fantasmas / o ultimo eh o "inteligente"
-int gatosx[] = {8, 12, 8, 12, 10};
-int gatosy[] = {3, 3, 5, 5, 4};
+int gatosx[] = {8, 12, 8, 12};
+int gatosy[] = {3, 3, 5, 5};
 
 // direcoes dos fantasmas
 bool fcima[] = {true, false, false, false};
@@ -56,20 +56,20 @@ bool fbaixo[] = {false, true, false, false};
 bool fesq[] = {false, false, true, false};
 bool fdir[] = {false, false, false, true};
 
-//pilula de força
-bool pilulaAtiva = false; //verifica se a pilula esta ativa
-sf::Clock tempoPilula; //relogio da pilula
+// pilula de força
+bool pilulaAtiva = false; // verifica se a pilula esta ativa
+sf::Clock tempoPilula;    // relogio da pilula
 
 float tempoFantasma = 0.2; // tempo normal do fantasma
-struct Mov //infos do player2
-{	
-	bool input=false;
-	bool vivo=true;
-	bool di=false, es=false, up=false, dow=false;
-	int movimentox=0, movimentoy=0;
-	int posx=9,posy=4;
-        float tempop2 = 0.2; // tempo normal do player 2
-        sf::Clock posmorteclock; // quanto tempo passou depois que p2 morreu
+struct Mov                 // infos do player2
+{
+    bool input = false;
+    bool vivo = true;
+    bool di = false, es = false, up = false, dow = false;
+    int movimentox = 0, movimentoy = 0;
+    int posx = 9, posy = 4;
+    float tempop2 = 0.2;     // tempo normal do player 2
+    sf::Clock posmorteclock; // quanto tempo passou depois que p2 morreu
 };
 Mov p2;
 
@@ -158,28 +158,30 @@ void mudarDirecao(int i)
     }
 }
 
-//mata o fantasma 
-void death(){
-        for(int i=0; i<4; i++)
+// mata o fantasma
+void death()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (gatovivo[i] && gatosx[i] == posx && gatosy[i] == posy)
         {
-            if(gatovivo[i] && gatosx[i]==posx && gatosy[i]==posy)
+            if (pilulaAtiva)
             {
-                if(pilulaAtiva)
-                {
-                    gatovivo[i]=false;
-                }
-                else 
-                    vivo=false; //"mata" o pacman 
+                gatovivo[i] = false;
             }
+            else
+                vivo = false; //"mata" o pacman
         }
+    }
 }
-int main() {
-    for(int i=0;i<MAPALT;i++) //verifica a quantidade de pilulas
-	    for(int j=0;j<MAPLARG;j++)
-	    {
-		if(mapa[i][j]=='2')
-			pontosmax++;
-	    }
+int main()
+{
+    for (int i = 0; i < MAPALT; i++) // verifica a quantidade de pilulas
+        for (int j = 0; j < MAPLARG; j++)
+        {
+            if (mapa[i][j] == '2')
+                pontosmax++;
+        }
     // cria a janela
     sf::RenderWindow window(sf::VideoMode({1100, 650}), "Pac-Man");
 
@@ -188,58 +190,62 @@ int main() {
     quad.setFillColor(sf::Color(0, 100, 200));
     quad.setOutlineThickness(-5);
     quad.setOutlineColor(sf::Color(50, 50, 50));
-    
-    //quadrado para as margens do jogo
+
+    // quadrado para as margens do jogo
     sf::RectangleShape quadmargem({SIZE, SIZE});
     quadmargem.setFillColor(sf::Color(0, 20, 60));
-	
-    //pilulas
-     sf::CircleShape circ(5);
-    circ.setFillColor(sf::Color(255, 255, 0));
-    
-    //pilula de força
-    
-     sf::CircleShape pilulaforca(10);
-    pilulaforca.setFillColor(sf::Color(255, 165, 0));
 
+    // pilulas
+    sf::CircleShape circ(5);
+    circ.setFillColor(sf::Color(255, 255, 0));
+
+    // pilula de força
+
+    sf::CircleShape pilulaforca(10);
+    pilulaforca.setFillColor(sf::Color(255, 165, 0));
 
     // sprites do PacMan
     sf::Texture texture;
-    if (!texture.loadFromFile("peixe_dir.png")) {
+    if (!texture.loadFromFile("peixe_dir.png"))
+    {
         std::cout << "Erro lendo imagem peixe_dir.png\n";
         return 0;
     }
     sf::Sprite sprite{texture};
 
     sf::Texture texturesq;
-    if (!texturesq.loadFromFile("peixe_esq.png")) {
+    if (!texturesq.loadFromFile("peixe_esq.png"))
+    {
         std::cout << "Erro lendo imagem peixe_esq.png\n";
         return 0;
     }
     sf::Sprite spritesq{texturesq};
 
     sf::Texture texturecim;
-    if (!texturecim.loadFromFile("peixe_cima.png")) {
-       std::cout << "Erro lendo imagem peixe_cima.png\n";
-       return 0;
+    if (!texturecim.loadFromFile("peixe_cima.png"))
+    {
+        std::cout << "Erro lendo imagem peixe_cima.png\n";
+        return 0;
     }
     sf::Sprite spritecim{texturecim};
 
     sf::Texture texturebai;
-    if (!texturebai.loadFromFile("peixe_baixo.png")) {
+    if (!texturebai.loadFromFile("peixe_baixo.png"))
+    {
         std::cout << "Erro lendo imagem peixe_baixo.png\n";
         return 0;
     }
     sf::Sprite spritebai{texturebai};
 
-    //textura do p2
+    // textura do p2
     sf::Texture texturep2;
-    if (!texturep2.loadFromFile("gatinho_rosa.png")) {
+    if (!texturep2.loadFromFile("gatinho_rosa.png"))
+    {
         std::cout << "Erro lendo imagem gatinho_rosa.png\n";
         return 0;
     }
     sf::Sprite spritep2{texturep2};
-    
+
     // sprites do fantasma
     sf::Texture texturegato;
     if (!texturegato.loadFromFile("gatinho.png"))
@@ -250,46 +256,50 @@ int main() {
     sf::Sprite sprite2{texturegato};
 
     sf::Texture textureaquario;
-    if (!textureaquario.loadFromFile("aquario.png")) {
+    if (!textureaquario.loadFromFile("aquario.png"))
+    {
         std::cout << "Erro lendo imagem aquario.png\n";
         return 0;
     }
     sf::Sprite sprite3{textureaquario};
 
     sf::Texture texturegatoazul;
-    if (!texturegatoazul.loadFromFile("gatinho_azul.png")) {
+    if (!texturegatoazul.loadFromFile("gatinho_azul.png"))
+    {
         std::cout << "Erro lendo imagem aquario.png\n";
         return 0;
     }
     sf::Sprite spritegatoazul{texturegatoazul};
 
-    sf::Font fonte; //carrega fonte principal
-    if (!fonte.openFromFile("Emulogic-zrEw.ttf")) {
+    sf::Font fonte; // carrega fonte principal
+    if (!fonte.openFromFile("Emulogic-zrEw.ttf"))
+    {
         std::cout << "Erro lendo a fonte Emulogic-zrEw.ttf\n";
-        return 0; 
+        return 0;
     }
-    sf::Font fonte2; //carrega fonte secundária
-    if (!fonte2.openFromFile("PacfontGood-yYye.ttf")) {
+    sf::Font fonte2; // carrega fonte secundária
+    if (!fonte2.openFromFile("PacfontGood-yYye.ttf"))
+    {
         std::cout << "Erro lendo a fonte PacfontGood-yYye.ttf\n";
-        return 0; 
+        return 0;
     }
-    
-    sf::Text placar(fonte); //cria um placar 
-    placar.setCharacterSize(40); 
-    placar.setFillColor(sf::Color::White); 
-    placar.setPosition({0.f, 0.f}); 
 
-    sf::Text win(fonte2); //texto de vitoria
+    sf::Text placar(fonte); // cria um placar
+    placar.setCharacterSize(40);
+    placar.setFillColor(sf::Color::White);
+    placar.setPosition({0.f, 0.f});
+
+    sf::Text win(fonte2); // texto de vitoria
     win.setString("Vitoria!!! 1  9");
-    win.setCharacterSize(100); 
-    win.setFillColor(sf::Color::White); 
-    win.setPosition({100.f, 225.f}); 
+    win.setCharacterSize(100);
+    win.setFillColor(sf::Color::White);
+    win.setPosition({100.f, 225.f});
 
-    sf::Text lose(fonte2); //texto de derrota
+    sf::Text lose(fonte2); // texto de derrota
     lose.setString("Derrota 9000001");
-    lose.setCharacterSize(100); 
-    lose.setFillColor(sf::Color::Red); 
-    lose.setPosition({100.f, 225.f}); 
+    lose.setCharacterSize(100);
+    lose.setFillColor(sf::Color::Red);
+    lose.setPosition({100.f, 225.f});
 
     // cria um relogio para medir o tempo do PacMan
     sf::Clock clock;
@@ -299,167 +309,177 @@ int main() {
     sf::Clock fclock;
 
     // executa o programa enquanto a janela está aberta
-    while (window.isOpen()) {
+    while (window.isOpen())
+    {
         // verifica todos os eventos que foram acionados na janela desde a última iteração do loop
-        while (const std::optional event = window.pollEvent()) {
+        while (const std::optional event = window.pollEvent())
+        {
             // evento "fechar" acionado: fecha a janela
             if (event->is<sf::Event::Closed>())
                 window.close();
-            else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-                  if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-                      window.close();
-                  else if (keyPressed->scancode == sf::Keyboard::Scancode::Left) {
-                      esq = true;   // left key: PacMan tem intenção de se mover para esquerda
-                      dir = cima = baixo = false;
-                  }
-                  else if (keyPressed->scancode == sf::Keyboard::Scancode::Right) {
-                      dir = true;   // right key: PacMan tem intenção de se mover para direita
-                      esq = cima = baixo = false;
-                  }
-                  else if (keyPressed->scancode == sf::Keyboard::Scancode::Up) {
-                      cima = true;   // up key: PacMan tem intenção de se mover para cima
-                      esq = dir = baixo = false;
-                  }
-                  else if (keyPressed->scancode == sf::Keyboard::Scancode::Down) {
-                      baixo = true;   // down key: PacMan tem intenção de se mover para baixo
-                      esq = dir = cima = false;
-                  }
+            else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+                    window.close();
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::Left)
+                {
+                    esq = true; // left key: PacMan tem intenção de se mover para esquerda
+                    dir = cima = baixo = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::Right)
+                {
+                    dir = true; // right key: PacMan tem intenção de se mover para direita
+                    esq = cima = baixo = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::Up)
+                {
+                    cima = true; // up key: PacMan tem intenção de se mover para cima
+                    esq = dir = baixo = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::Down)
+                {
+                    baixo = true; // down key: PacMan tem intenção de se mover para baixo
+                    esq = dir = cima = false;
+                }
 
-         
-
-		  if (keyPressed->scancode == sf::Keyboard::Scancode::W && p2.vivo==true) { //detecção do segundo player, ele não pode reviver
-                      p2.input=true;
-		      p2.up=true;
-		      p2.dow=p2.di=p2.es=false;
-                  }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::S && p2.vivo==true ) {
-		      p2.input=true;
-		      p2.dow=true;
-		      p2.up=p2.di=p2.es=false;
-                  }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::A && p2.vivo==true) {
-		      p2.input=true;
-		      p2.es=true;
-		      p2.up=p2.dow=p2.di=false;
-                  }
-		  else if (keyPressed->scancode == sf::Keyboard::Scancode::D && p2.vivo==true) {
-		      p2.input=true;
-		      p2.di=true;
-		      p2.up=p2.dow=p2.es=false;
-                  }
+                if (keyPressed->scancode == sf::Keyboard::Scancode::W && p2.vivo == true)
+                { // detecção do segundo player, ele não pode reviver
+                    p2.input = true;
+                    p2.up = true;
+                    p2.dow = p2.di = p2.es = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::S && p2.vivo == true)
+                {
+                    p2.input = true;
+                    p2.dow = true;
+                    p2.up = p2.di = p2.es = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::A && p2.vivo == true)
+                {
+                    p2.input = true;
+                    p2.es = true;
+                    p2.up = p2.dow = p2.di = false;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scancode::D && p2.vivo == true)
+                {
+                    p2.input = true;
+                    p2.di = true;
+                    p2.up = p2.dow = p2.es = false;
+                }
             }
         }
 
-	// Muda a posição do PacMan a cada 0.2 segundos
-        if (clock.getElapsedTime() > sf::seconds(0.2)) { // tempo desde último restart > 0.2s?
-            clock.restart();      // recomeça contagem do tempo
-	    if (cima&&mapa[posy-1][posx]!='1')
-	    {
-		    posy--;
-		    inten[1]=-1; //salva a ultima instrução válida
-		    inten[0]=0; //zera a instrução no outro eixo	
-	    }
-	    else if (baixo&&mapa[posy+1][posx]!='1')
-	    {
-		    posy++;
-		    inten[1]=+1;
-		    inten[0]=0;
-	    }
-	    else if (esq&&mapa[posy][posx-1]!='1')
-	    {
-		    posx--;
-		    inten[0]=-1;
-		    inten[1]=0;	    	    
-	    }
-	    else if (dir&&mapa[posy][posx+1]!='1') 
-	    {
-		    posx++;
-		    inten[0]=+1;
-		    inten[1]=0;
-	    }
-	    else if(mapa[posy+inten[1]][posx+inten[0]]!='1')
-	    {
-		    posy+=inten[1];
-		    posx+=inten[0];
-	    }
-	    if(posy>=MAPALT-1) //verifica caso do pac fora do mapa
-		posy=1; //inverte posição
-	    else if(posy<1) 
-		posy=MAPALT-2;
-	    else if(posx>=MAPLARG-2)//verifica se chegou ao /0 
-		posx=1;
-	    else if(posx<1) 
-		posx=MAPLARG-3; //transporta para fora de /0
-	    death();
-	}
+        // Muda a posição do PacMan a cada 0.2 segundos
+        if (clock.getElapsedTime() > sf::seconds(0.2))
+        {                    // tempo desde último restart > 0.2s?
+            clock.restart(); // recomeça contagem do tempo
+            if (cima && mapa[posy - 1][posx] != '1')
+            {
+                posy--;
+                inten[1] = -1; // salva a ultima instrução válida
+                inten[0] = 0;  // zera a instrução no outro eixo
+            }
+            else if (baixo && mapa[posy + 1][posx] != '1')
+            {
+                posy++;
+                inten[1] = +1;
+                inten[0] = 0;
+            }
+            else if (esq && mapa[posy][posx - 1] != '1')
+            {
+                posx--;
+                inten[0] = -1;
+                inten[1] = 0;
+            }
+            else if (dir && mapa[posy][posx + 1] != '1')
+            {
+                posx++;
+                inten[0] = +1;
+                inten[1] = 0;
+            }
+            else if (mapa[posy + inten[1]][posx + inten[0]] != '1')
+            {
+                posy += inten[1];
+                posx += inten[0];
+            }
+            if (posy >= MAPALT - 1) // verifica caso do pac fora do mapa
+                posy = 1;           // inverte posição
+            else if (posy < 1)
+                posy = MAPALT - 2;
+            else if (posx >= MAPLARG - 2) // verifica se chegou ao /0
+                posx = 1;
+            else if (posx < 1)
+                posx = MAPLARG - 3; // transporta para fora de /0
+            death();
+        }
 
-	// Muda a posição do Player 2 de acordo com se a pilula esta ou n ativa
-        if (p2clock.getElapsedTime() > sf::seconds(p2.tempop2)&&p2.input) 
-        { 
-            p2clock.restart(); 
-	    if (p2.up&&mapa[p2.posy-1][p2.posx]!='1')
-	    {
-		    p2.posy--;
-		    p2.movimentoy=-1; 
-		    p2.movimentox=0; 
-	    }
-	    else if (p2.dow&&mapa[p2.posy+1][p2.posx]!='1')
-	    {
-		    p2.posy++;
-		    p2.movimentoy=1; 
-		    p2.movimentox=0;
-	    }
-	    else if (p2.es&&mapa[p2.posy][p2.posx-1]!='1')
-	    {
-		    p2.posx--;
-		    p2.movimentoy=0; 
-		    p2.movimentox=-1;    	    
-	    }
-	    else if (p2.di&&mapa[p2.posy][p2.posx+1]!='1') 
-	    {
-		    p2.posx++;
-		    p2.movimentoy=0; 
-		    p2.movimentox=1;
-	    }
-	    else if(mapa[p2.posy+p2.movimentoy][p2.posx+p2.movimentox]!='1')
-	    {
-		    p2.posy+=p2.movimentoy;
-		    p2.posx+=p2.movimentox;
-	    }
-	    if(p2.posy>=MAPALT-1)
-		p2.posy=1; 
-	    else if(p2.posy<1) 
-		p2.posy=MAPALT-2;
-	    else if(p2.posx>=MAPLARG-2) 
-		p2.posx=1;
-	    else if(p2.posx<1) 
-		p2.posx=MAPLARG-3;
-	    death();
-	}
-	if (pilulaAtiva)
-	{
-  	    tempoFantasma = 0.8; // fantasma fica mais lento quando a pilula ta ativa
-  	    p2.tempop2 = 0.8; // fantasma controlavel tbm fica mais lento 
-	}
+        // Muda a posição do Player 2 de acordo com se a pilula esta ou n ativa
+        if (p2clock.getElapsedTime() > sf::seconds(p2.tempop2) && p2.input)
+        {
+            p2clock.restart();
+            if (p2.up && mapa[p2.posy - 1][p2.posx] != '1')
+            {
+                p2.posy--;
+                p2.movimentoy = -1;
+                p2.movimentox = 0;
+            }
+            else if (p2.dow && mapa[p2.posy + 1][p2.posx] != '1')
+            {
+                p2.posy++;
+                p2.movimentoy = 1;
+                p2.movimentox = 0;
+            }
+            else if (p2.es && mapa[p2.posy][p2.posx - 1] != '1')
+            {
+                p2.posx--;
+                p2.movimentoy = 0;
+                p2.movimentox = -1;
+            }
+            else if (p2.di && mapa[p2.posy][p2.posx + 1] != '1')
+            {
+                p2.posx++;
+                p2.movimentoy = 0;
+                p2.movimentox = 1;
+            }
+            else if (mapa[p2.posy + p2.movimentoy][p2.posx + p2.movimentox] != '1')
+            {
+                p2.posy += p2.movimentoy;
+                p2.posx += p2.movimentox;
+            }
+            if (p2.posy >= MAPALT - 1)
+                p2.posy = 1;
+            else if (p2.posy < 1)
+                p2.posy = MAPALT - 2;
+            else if (p2.posx >= MAPLARG - 2)
+                p2.posx = 1;
+            else if (p2.posx < 1)
+                p2.posx = MAPLARG - 3;
+            death();
+        }
+        if (pilulaAtiva)
+        {
+            tempoFantasma = 0.8; // fantasma fica mais lento quando a pilula ta ativa
+            p2.tempop2 = 0.8;    // fantasma controlavel tbm fica mais lento
+        }
 
-	//ativa a pilula de força
-    	if(mapa[posy][posx]=='4') 
-	{
-		mapa[posy][posx]='0';
-        	pilulaAtiva = true;
-        	tempoPilula.restart(); // começa a contar do zero o tempo da pilula
-	}         
-        //se o tempo da pilula acabou, volta ao normal
-	if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(7))
-	{
-        	pilulaAtiva = false;
-        	tempoFantasma = 0.2;
-        	p2.tempop2 = 0.2;
-    	}
+        // ativa a pilula de força
+        if (mapa[posy][posx] == '4')
+        {
+            mapa[posy][posx] = '0';
+            pilulaAtiva = true;
+            tempoPilula.restart(); // começa a contar do zero o tempo da pilula
+        }
+        // se o tempo da pilula acabou, volta ao normal
+        if (pilulaAtiva && tempoPilula.getElapsedTime() > sf::seconds(7))
+        {
+            pilulaAtiva = false;
+            tempoFantasma = 0.2;
+            p2.tempop2 = 0.2;
+        }
 
-	// Muda a posição dos fantasmas de acordo com se a pilula esta ativa ou não
+        // Muda a posição dos fantasmas de acordo com se a pilula esta ativa ou não
         if (fclock.getElapsedTime() > sf::seconds(tempoFantasma))
-	{
+        {
             fclock.restart();
             for (int i = 0; i < 3; i++) // para cada fantasma
             {
@@ -598,129 +618,131 @@ int main() {
                 else
                     gatosx[3]++;
             }
-	    death();
+            death();
         }
-        if(mapa[posy][posx]=='2') //sistema de pontos, conta e remove as pilulas
-	{
-		pontos++;
-		mapa[posy][posx]='0';
-	}
+        if (mapa[posy][posx] == '2') // sistema de pontos, conta e remove as pilulas
+        {
+            pontos++;
+            mapa[posy][posx] = '0';
+        }
 
-	// limpa a janela com a cor preta
+        // limpa a janela com a cor preta
         window.clear(sf::Color::Black);
 
         // desenhar tudo aqui...
 
-        //desenha paredes
-        for(int i=0;i<13;i++)
-            for(int j=0;j<23;j++)
-                if (mapa[i][j]=='1') {
-                    quad.setPosition({j*SIZE, i*SIZE});
+        // desenha paredes
+        for (int i = 0; i < 13; i++)
+            for (int j = 0; j < 23; j++)
+                if (mapa[i][j] == '1')
+                {
+                    quad.setPosition({j * SIZE, i * SIZE});
                     window.draw(quad);
                 }
-                
-       //desenha as margens            
-        for(int i=0;i<13;i++)
-           for(int j=0;j<23;j++)
-                if (mapa[i][j]=='3') {
-                    quadmargem.setPosition({j*SIZE, i*SIZE});
+
+        // desenha as margens
+        for (int i = 0; i < 13; i++)
+            for (int j = 0; j < 23; j++)
+                if (mapa[i][j] == '3')
+                {
+                    quadmargem.setPosition({j * SIZE, i * SIZE});
                     window.draw(quadmargem);
                 }
-                
-	//desenha pilulas
-	for(int i=0;i<13;i++)
-            for(int j=0;j<23;j++)
-                if (mapa[i][j]=='2') {
-                    circ.setPosition({j*SIZE + 25, i*SIZE + 25});
+
+        // desenha pilulas
+        for (int i = 0; i < 13; i++)
+            for (int j = 0; j < 23; j++)
+                if (mapa[i][j] == '2')
+                {
+                    circ.setPosition({j * SIZE + 25, i * SIZE + 25});
                     window.draw(circ);
                 }
 
-    //desenha a pilula de força
-	for(int i=0;i<13;i++)
-            for(int j=0;j<23;j++)
-                if (mapa[i][j]=='4') {
-                    pilulaforca.setPosition({j*SIZE + 20, i*SIZE + 20});
+        // desenha a pilula de força
+        for (int i = 0; i < 13; i++)
+            for (int j = 0; j < 23; j++)
+                if (mapa[i][j] == '4')
+                {
+                    pilulaforca.setPosition({j * SIZE + 20, i * SIZE + 20});
                     window.draw(pilulaforca);
-                }    
-    
+                }
 
-    // desenha PacMan
-	if(inten[0]==-1)
-	{
-		spritesq.setPosition({posx*SIZE,posy*SIZE});
-       		window.draw(spritesq);
-	}
-	else if(inten[1]==-1)
-	{
-		spritecim.setPosition({posx*SIZE,posy*SIZE});
-      		window.draw(spritecim);
-	}
-	else if(inten[1]==1)
-	{
-		spritebai.setPosition({posx*SIZE,posy*SIZE});
-	       	window.draw(spritebai);
-	}
-	else
-	{
-		sprite.setPosition({posx*SIZE,posy*SIZE});
-       	window.draw(sprite);
-	}
-	for(int i=0; i<4; i++)
-  	{ 
-        	if(gatovivo[i])
-    		{   
-        		if(!pilulaAtiva)
-        		{
-            			sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
-            			window.draw(sprite2);
-        		}
-        		else
-        		{
-            			spritegatoazul.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
-            			window.draw(spritegatoazul);  
-        		}          
-    		}   
-  	}
-	//desenha p2
-	if(p2.input)
-	{
-		spritep2.setPosition({p2.posx*SIZE,p2.posy*SIZE});
-       		window.draw(spritep2);
-	}
+        // desenha PacMan
+        if (inten[0] == -1)
+        {
+            spritesq.setPosition({posx * SIZE, posy * SIZE});
+            window.draw(spritesq);
+        }
+        else if (inten[1] == -1)
+        {
+            spritecim.setPosition({posx * SIZE, posy * SIZE});
+            window.draw(spritecim);
+        }
+        else if (inten[1] == 1)
+        {
+            spritebai.setPosition({posx * SIZE, posy * SIZE});
+            window.draw(spritebai);
+        }
+        else
+        {
+            sprite.setPosition({posx * SIZE, posy * SIZE});
+            window.draw(sprite);
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (gatovivo[i])
+            {
+                if (!pilulaAtiva)
+                {
+                    sprite2.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
+                    window.draw(sprite2);
+                }
+                else
+                {
+                    spritegatoazul.setPosition({gatosx[i] * SIZE, gatosy[i] * SIZE});
+                    window.draw(spritegatoazul);
+                }
+            }
+        }
+        // desenha p2
+        if (p2.input)
+        {
+            spritep2.setPosition({p2.posx * SIZE, p2.posy * SIZE});
+            window.draw(spritep2);
+        }
 
-	//desenha a margem topo 
-        sprite3.setPosition({0,0});
+        // desenha a margem topo
+        sprite3.setPosition({0, 0});
         window.draw(sprite3);
-	
-	placar.setString("Pontos: " + to_string(pontos));
-	window.draw(placar); //desenha o placar
-        if(pontos==pontosmax&&vivo) //condição de vitória, check de "vivo" para evitar que o pacman ganhe post mortem
-	{
-		window.clear(sf::Color::Black);
-		window.draw(win);
-	}
-	else if((p2.posx==posx&&p2.posy==posy&&p2.input)||!vivo) //condição de derrota do pacman/ vitoria do p2|fantasmas
-	{	
-       		 if(!pilulaAtiva)
-       		 {
-         		 vivo=false; //"mata" o pacman  
-           		 window.clear(sf::Color::Black);
-           		 window.draw(lose);
-                 }
-       		 else 
-       		 {
-                    p2.vivo=false; //mata o player 2 
-            		p2.input= false;
-                    p2.posmorteclock.restart();
-        	 }
-	}
 
-    if(p2.posmorteclock.getElapsedTime() > sf::seconds(5))
-        p2.vivo = true; // depois que passou 5 segundos que o player 2 morreu, ele pode reviver
-        
+        placar.setString("Pontos: " + to_string(pontos));
+        window.draw(placar);             // desenha o placar
+        if (pontos == pontosmax && vivo) // condição de vitória, check de "vivo" para evitar que o pacman ganhe post mortem
+        {
+            window.clear(sf::Color::Black);
+            window.draw(win);
+        }
+        else if ((p2.posx == posx && p2.posy == posy && p2.input) || !vivo) // condição de derrota do pacman/ vitoria do p2|fantasmas
+        {
+            if (!pilulaAtiva)
+            {
+                vivo = false; //"mata" o pacman
+                window.clear(sf::Color::Black);
+                window.draw(lose);
+            }
+            else
+            {
+                p2.vivo = false; // mata o player 2
+                p2.input = false;
+                p2.posmorteclock.restart();
+            }
+        }
+
+        if (p2.posmorteclock.getElapsedTime() > sf::seconds(5))
+            p2.vivo = true; // depois que passou 5 segundos que o player 2 morreu, ele pode reviver
+
         // termina e desenha o frame corrente
-        window.display();	
+        window.display();
     }
     return 0;
 }
-
