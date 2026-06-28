@@ -47,8 +47,8 @@ bool gatovivo[4] = {true, true, true, true}; // se os fantasmas n foram mortos p
 bool p2vivo = true;
 
 // posições dos fantasmas / o ultimo eh o "inteligente"
-int gatosx[] = {8, 12, 8, 12};
-int gatosy[] = {3, 3, 5, 5};
+int gatosx[] = {9, 13, 9, 13};
+int gatosy[] = {4, 4, 6, 6};
 
 // direcoes dos fantasmas
 bool fcima[] = {true, false, false, false};
